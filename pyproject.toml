@@ -57,6 +57,13 @@ dev = [
   "twine"
 ]
 
+[project.optional-dependencies]
+docs = [
+  "sphinx>=7",
+  "numpydoc>=1.7",
+  "furo>=2024.0.0",
+]
+
 [project.urls]
 Repository = "https://github.com/colodnerdata/polygraph"
 Issues = "https://github.com/colodnerdata/polygraph/issues"
@@ -81,6 +88,7 @@ select = [
     "N",  # pep8 naming
     "D",  # pydocstyle
 ]
+ignore = ["D203", "D213"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
