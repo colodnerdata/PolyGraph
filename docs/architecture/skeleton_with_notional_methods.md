@@ -63,8 +63,9 @@ polygraph/\
 │       │\
 │       ├── visualization/\
 │       │   ├── **init**.py\
-│       │   ├── matplotlib.py\
-│       │   └── threejs.py\
+│       │   ├── matplotlib_planar.py\
+│       │   ├── mesh_threejs.py\
+│       │   └── svg_planar.py\
 │       │\
 │       └── export/\
 │           ├── **init**.py\
