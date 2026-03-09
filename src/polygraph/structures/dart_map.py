@@ -4,7 +4,7 @@ A DartMap encodes the topology of a graph embedding through three fundamental pe
 the set of darts:
 sigma — cyclic order of darts around each vertex
 alpha — pairing of opposite darts along each edge (an involution)
-phi = sigma ∘ alpha — traversal of darts around faces
+phi(d) = sigma^{-1}(alpha(d)) — traversal of darts around faces
 This representation cleanly separates combinatorial topology from geometry. 
 The module provides utilities to construct maps, iterate vertex/edge/face orbits, and compute 
 topological invariants such as the Euler characteristic and genus.
