@@ -75,12 +75,14 @@ export/
 
 Example
 
+```python
 from polygraph.generators.platonic import cube
 
 mesh = cube()
 
 print(mesh.num_vertices())
 print(mesh.num_faces())
+```
 
 ---
 
