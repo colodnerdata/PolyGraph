@@ -410,9 +410,9 @@ Notional methods:
 
 # export/
 
-## mesh.py
+## mesh_json.py / planar_json.py / svg.py
 
-Mesh representation utilities.
+Mesh and drawing export utilities.
 
 Notional methods:
 
