@@ -27,4 +27,4 @@ add_module_names = False
 numpydoc_show_class_members = False
 numpydoc_class_members_toctree = False
 
-master_doc = "index"
+master_doc = "API"
