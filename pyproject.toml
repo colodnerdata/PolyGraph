@@ -57,7 +57,6 @@ dev = [
   "twine"
 ]
 
-[project.optional-dependencies]
 docs = [
   "sphinx>=7",
   "numpydoc>=1.7",
