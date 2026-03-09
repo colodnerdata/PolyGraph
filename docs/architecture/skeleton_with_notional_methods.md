@@ -5,15 +5,16 @@
 polygraph/\
 ├── pyproject.toml\
 ├── README.md\
-├── OVERVIEW.md\
 ├── LICENSE\
 │\
 ├── docs/\
-│   └── source/\
-│       ├── index.rst\
-│       ├── api.rst\
-│       ├── architecture.rst\
-│       └── algorithms.rst\
+│   ├── architecture/\
+│   │   ├── dart_map.md\
+│   │   ├── overview.md\
+│   │   └── skeleton_with_notional_methods.md\
+│   └── algorithms/\
+│       ├── planar_embedding.md\
+│       └── symmetry.md\
 │\
 ├── src/\
 │   └── polygraph/\
@@ -24,6 +25,7 @@ polygraph/\
 │       │   ├── dart_map.py\
 │       │   ├── traversal.py\
 │       │   ├── dual.py\
+│       │   ├── io.py\
 │       │   └── validation.py\
 │       │\
 │       ├── generators/\
@@ -43,44 +45,61 @@ polygraph/\
 │       │   │   ├── point_groups.py\
 │       │   │   └── classify.py\
 │       │   │\
-│       │   └── planar/\
+│       │   ├── planar/\
+│       │   │   ├── __init__.py\
+│       │   │   ├── embedding.py\
+│       │   │   ├── outer_face.py\
+│       │   │   ├── canonical_order.py\
+│       │   │   ├── contour_state.py\
+│       │   │   └── shift_structure.py\
+│       │   │\
+│       │   └── triangulation/\
 │       │       ├── __init__.py\
-│       │       ├── embedding.py\
-│       │       ├── outer_face.py\
-│       │       └── canonical_order.py\
+│       │       ├── augment.py\
+│       │       └── validation.py\
 │       │\
 │       ├── geometry/\
-│       │   ├── **init**.py\
+│       │   ├── __init__.py\
 │       │   │\
 │       │   ├── planar/\
+│       │   │   ├── __init__.py\
 │       │   │   ├── layout.py\
-│       │   │   └── refinement.py\
+│       │   │   ├── refinement.py\
+│       │   │   ├── objectives.py\
+│       │   │   └── constraints.py\
 │       │   │\
 │       │   └── polyhedral/\
+│       │       ├── __init__.py\
 │       │       ├── face_planes.py\
 │       │       ├── vertex_recovery.py\
+│       │       ├── initialization.py\
 │       │       └── optimizer.py\
 │       │\
 │       ├── visualization/\
-│       │   ├── **init**.py\
+│       │   ├── __init__.py\
 │       │   ├── matplotlib_planar.py\
 │       │   ├── mesh_threejs.py\
 │       │   └── svg_planar.py\
 │       │\
+│       ├── interop/\
+│       │   ├── __init__.py\
+│       │   ├── bliss_adapter.py\
+│       │   ├── networkx_adapter.py\
+│       │   └── ogdf_adapter.py\
+│       │\
 │       └── export/\
-│           ├── **init**.py\
+│           ├── __init__.py\
 │           ├── obj.py\
-│           └── mesh.py\
+│           ├── mesh_json.py\
+│           ├── planar_json.py\
+│           └── svg.py\
 │\
 └── tests/\
-├── test_dart_map.py\
-├── test_traversal.py\
-├── test_dual.py\
-├── test_generators.py\
-├── test_symmetry.py\
-├── test_planar_algorithms.py\
-├── test_planar_layout.py\
-└── test_polyhedral_realization.py\
+    ├── __init__.py\
+    ├── algorithms/\
+    ├── generators/\
+    ├── geometry/\
+    └── structures/\
 
 ---
 
