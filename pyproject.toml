@@ -1,0 +1,97 @@
+[build-system]
+requires = ["hatchling>=1.16"]
+build-backend = "hatchling.build"
+
+[project]
+name = "polygraph"
+version = "0.1.0"
+description = "Polyhedral topology and geometry using combinatorial maps, symmetry analysis, planar embeddings, and geometric realization."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+
+authors = [
+  { name = "Stephen Colodner" }
+]
+
+keywords = [
+  "polyhedra",
+  "graph-theory",
+  "computational-geometry",
+  "planar-graphs",
+  "combinatorial-maps"
+]
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+dependencies = [
+  "numpy>=1.26"
+]
+
+[project.optional-dependencies]
+planar = [
+  "networkx>=3.2"
+]
+
+opt = [
+  "scipy>=1.11"
+]
+
+viz = [
+  "matplotlib>=3.8"
+]
+
+dev = [
+  "pytest>=8",
+  "ruff>=0.6",
+  "mypy>=1.10",
+  "build",
+  "twine"
+]
+
+docs = [
+  "sphinx>=7",
+  "numpydoc>=1.7",
+  "furo>=2024.0.0",
+]
+
+[project.urls]
+Repository = "https://github.com/colodnerdata/polygraph"
+Issues = "https://github.com/colodnerdata/polygraph/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/polygraph"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 79
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle
+    "F",  # pyflakes
+    "I",  # import sorting
+    "B",  # bugbear
+    "UP", # pyupgrade
+    "N",  # pep8 naming
+    "D",  # pydocstyle
+]
+ignore = ["D203", "D213"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["polygraph"]

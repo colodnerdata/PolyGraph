@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+title: PolyGraph
+message: "If you use PolyGraph in research, please cite this repository."
+type: software
+authors:
+  - given-names: Stephen
+    family-names: Colodner
+repository-code: https://github.com/colodnerdata/polygraph
+license: Apache-2.0
+version: 0.1.0
+date-released: 2026-01-01
