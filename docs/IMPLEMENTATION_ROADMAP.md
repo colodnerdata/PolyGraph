@@ -45,6 +45,67 @@ Each function returns `DartMap.from_face_lists(faces, n_vertices)`.
 
 Defer `cupola(n)` and `rotunda()` — they need more complex face winding.
 
+### 1d. Convex Deltahedra — Coverage Confirmed
+
+All 8 convex deltahedra (polyhedra whose faces are all equilateral triangles) are covered by
+existing generators — no additional entries are needed:
+
+- **3 Platonic:** tetrahedron, octahedron, icosahedron (`platonic.py`)
+- **2 via `bipyramid(n)`:** triangular bipyramid (J12, n=3), pentagonal bipyramid (J13, n=5)
+- **3 remaining Johnson deltahedra** — add as individual stubs in `johnson.py` (defer
+  implementation; hardcoded face lists required, no simple parametric form):
+
+| Function | Johnson # | V | E | F |
+|---|---|---|---|---|
+| `snub_disphenoid()` | J84 | 8 | 18 | 12 |
+| `triaugmented_triangular_prism()` | J51 | 9 | 21 | 14 |
+| `gyroelongated_square_bipyramid()` | J17 | 10 | 24 | 16 |
+
+### 1e. `generators/archimedean.py` (stub — defer)
+
+The 13 Archimedean solids are vertex-transitive with regular polygon faces. Several arise
+naturally from Conway operators on Platonic solids (`truncate`, `ambo`, `expand`, `snub` —
+Phase 9), so defer hardcoded implementations until Phase 9 is complete. Add function stubs
+with `raise NotImplementedError` now so call sites can be written.
+
+| Function | Vertex config | V | E | F |
+|---|---|---|---|---|
+| `truncated_tetrahedron()` | 3.6.6 | 12 | 18 | 8 |
+| `cuboctahedron()` | 3.4.3.4 | 12 | 24 | 14 |
+| `truncated_cube()` | 3.8.8 | 24 | 36 | 14 |
+| `truncated_octahedron()` | 4.6.6 | 24 | 36 | 14 |
+| `rhombicuboctahedron()` | 3.4.4.4 | 24 | 48 | 26 |
+| `truncated_cuboctahedron()` | 4.6.8 | 48 | 72 | 26 |
+| `snub_cube()` | 3.3.3.3.4 | 24 | 60 | 38 |
+| `icosidodecahedron()` | 3.5.3.5 | 30 | 60 | 32 |
+| `truncated_dodecahedron()` | 3.10.10 | 60 | 90 | 32 |
+| `truncated_icosahedron()` | 5.6.6 | 60 | 90 | 32 |
+| `rhombicosidodecahedron()` | 3.4.5.4 | 60 | 120 | 62 |
+| `truncated_icosidodecahedron()` | 4.6.10 | 120 | 180 | 62 |
+| `snub_dodecahedron()` | 3.3.3.3.5 | 60 | 150 | 92 |
+
+### 1f. `generators/catalan.py` (stub — defer)
+
+The 13 Catalan solids are the duals of the Archimedean solids. Defer until Phase 2 dual
+construction (`dual_of`) and Phase 9 Conway operators are complete; most can be derived via
+`dual_of(archimedean_solid())`. Add function stubs with `raise NotImplementedError` now.
+
+| Function | Dual of | Face type |
+|---|---|---|
+| `triakis_tetrahedron()` | truncated tetrahedron | isosceles triangle |
+| `rhombic_dodecahedron()` | cuboctahedron | rhombus |
+| `triakis_octahedron()` | truncated cube | isosceles triangle |
+| `tetrakis_hexahedron()` | truncated octahedron | isosceles triangle |
+| `deltoidal_icositetrahedron()` | rhombicuboctahedron | kite |
+| `disdyakis_dodecahedron()` | truncated cuboctahedron | scalene triangle |
+| `pentagonal_icositetrahedron()` | snub cube | irregular pentagon |
+| `rhombic_triacontahedron()` | icosidodecahedron | rhombus |
+| `triakis_icosahedron()` | truncated dodecahedron | isosceles triangle |
+| `pentakis_dodecahedron()` | truncated icosahedron | isosceles triangle |
+| `deltoidal_hexacontahedron()` | rhombicosidodecahedron | kite |
+| `disdyakis_triacontahedron()` | truncated icosidodecahedron | scalene triangle |
+| `pentagonal_hexacontahedron()` | snub dodecahedron | irregular pentagon |
+
 ### Testing
 - Euler characteristic = 2 for every generated solid
 - Genus = 0
@@ -56,6 +117,8 @@ Defer `cupola(n)` and `rotunda()` — they need more complex face winding.
 - `src/polygraph/generators/platonic.py`
 - `src/polygraph/generators/prisms.py`
 - `src/polygraph/generators/johnson.py`
+- `src/polygraph/generators/archimedean.py` (stubs only)
+- `src/polygraph/generators/catalan.py` (stubs only)
 - `tests/generators/test_platonic.py`
 - `tests/generators/test_prisms.py`
 
