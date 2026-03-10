@@ -14,8 +14,8 @@ realizations while remaining independent of any coordinate system.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Sequence
 
 
 def _inverse_permutation(perm: Sequence[int]) -> list[int]:
@@ -302,7 +302,7 @@ class DartMap:
         return numerator // 2
 
     @classmethod
-    def from_face_lists(cls, faces: Sequence[Sequence[int]], num_vertices: int) -> "DartMap":
+    def from_face_lists(cls, faces: Sequence[Sequence[int]], num_vertices: int) -> DartMap:
         """Construct a map from oriented face vertex cycles.
 
         Parameters

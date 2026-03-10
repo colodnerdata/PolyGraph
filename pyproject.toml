@@ -87,7 +87,7 @@ select = [
     "N",  # pep8 naming
     "D",  # pydocstyle
 ]
-ignore = ["D203", "D213"]
+ignore = ["D203", "D213", "D100", "D104"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
