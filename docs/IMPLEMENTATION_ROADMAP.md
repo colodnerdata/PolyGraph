@@ -120,7 +120,7 @@ existing generators:
 
 The 13 Archimedean solids are vertex-transitive with regular polygon faces. Several arise
 naturally from Conway operators on Platonic solids (`truncate`, `ambo`, `expand`, `snub` —
-Phase 9), so defer hardcoded implementations until Phase 9 is complete. Add function stubs
+Phase 10), so defer hardcoded implementations until Phase 10 is complete. Add function stubs
 with `raise NotImplementedError` now so call sites can be written.
 
 | Function | Vertex config | V | E | F |
@@ -142,7 +142,7 @@ with `raise NotImplementedError` now so call sites can be written.
 ### 1f. `generators/catalan.py` (stub — defer)
 
 The 13 Catalan solids are the duals of the Archimedean solids. Defer until Phase 2 dual
-construction (`dual_of`) and Phase 9 Conway operators are complete; most can be derived via
+construction (`dual_of`) and Phase 10 Conway operators are complete; most can be derived via
 `dual_of(archimedean_solid())`. Add function stubs with `raise NotImplementedError` now.
 
 | Function | Dual of | Face type |
@@ -499,7 +499,7 @@ Extract and expose the invariant checks already embedded in `DartMap.__post_init
 
 ## Phase 5: Triangulation
 
-**Why now:** Chrobak-Kant convex grid drawing (Phase 7: Canonical Ordering & Convex Grid Drawing) requires a **triangulated** 3-connected planar graph. Most Platonic solids are not triangulated (cube has quad faces, dodecahedron has pentagonal faces).
+**Why now:** Chrobak-Kant convex grid drawing (Phase 8: Canonical Ordering & Convex Grid Drawing) requires a **triangulated** 3-connected planar graph. Most Platonic solids are not triangulated (cube has quad faces, dodecahedron has pentagonal faces).
 
 ### 5a. `algorithms/triangulation/augment.py`
 - `triangulate(dm) -> DartMap`: Fan-triangulate every non-triangular face by adding edges from one vertex to all non-adjacent vertices on the face boundary
@@ -525,15 +525,42 @@ Extract and expose the invariant checks already embedded in `DartMap.__post_init
 
 ---
 
-## Phase 6: Planar Embedding Infrastructure
+## Phase 6: NetworkX Interop
 
-### 6a. `algorithms/planar/embedding.py`
+**Why now:** `networkx` is a required dependency of the `planar` extras. The
+planar-embedding and layout phases that follow use NetworkX utilities (shortest
+paths, planarity checks, graph analysis). Establishing the adapter here — before
+any planar phase begins — lets those phases rely on NetworkX freely and allows
+users to round-trip between `DartMap` and NetworkX graphs from the start of
+planar work.
+
+### 6a. `interop/networkx_adapter.py`
+- `dart_map_to_nx(dm) -> nx.Graph`: Convert DartMap to an undirected NetworkX
+  graph (vertices as nodes, one edge per edge orbit). Embedding information is
+  not preserved, but adjacency is.
+- `nx_to_dart_map(g) -> DartMap`: Convert an undirected planar NetworkX graph to
+  a DartMap, using `nx.check_planarity` to derive face lists.
+
+### Testing
+- `dart_map_to_nx(cube())` has 8 nodes and 12 edges
+- Round-trip: `nx_to_dart_map(dart_map_to_nx(dm))` recovers the same V, E, F
+  counts for each Platonic solid
+
+### Files
+- `src/polygraph/interop/networkx_adapter.py`
+- `tests/interop/test_networkx_adapter.py`
+
+---
+
+## Phase 7: Planar Embedding Infrastructure
+
+### 7a. `algorithms/planar/embedding.py`
 - `PlanarEmbeddingView(dm)`: Thin wrapper providing neighbor-order and face-boundary queries in terms the planar algorithms expect. Mostly delegates to traversal functions.
 - `ordered_neighbors(v)` → vertices adjacent to v in cyclic (sigma) order
 - `face_boundary_vertices(f)` → boundary vertices of face f
 - `degree(v)` → number of darts at vertex v
 
-### 6b. `algorithms/planar/outer_face.py`
+### 7b. `algorithms/planar/outer_face.py`
 - `choose_outer_face(dm) -> int`: Select the face to serve as the outer (unbounded) face for planar drawing. Heuristic: choose the face with the most boundary vertices.
 - `outer_face_anchors(dm, outer_face) -> tuple[int, int, int]`: Pick three vertices on the outer face boundary to anchor the convex drawing (needed by canonical ordering).
 
@@ -549,11 +576,11 @@ Extract and expose the invariant checks already embedded in `DartMap.__post_init
 
 ---
 
-## Phase 7: Canonical Ordering & Convex Grid Drawing
+## Phase 8: Canonical Ordering & Convex Grid Drawing
 
 This is the core near-term research target from the README.
 
-### 7a. `algorithms/planar/canonical_order.py`
+### 8a. `algorithms/planar/canonical_order.py`
 Canonical ordering of a **triangulated** 3-connected planar graph (de Fraysseix, Pach, Pollack / Kant).
 
 **Input:** Triangulated DartMap + outer face with 3 anchor vertices (v1, v2, vn)
@@ -566,16 +593,16 @@ Canonical ordering of a **triangulated** 3-connected planar graph (de Fraysseix,
 
 **Math:** Graph theory — contiguous neighbor intervals on a boundary path. Implementation uses the DartMap's face/vertex traversal to identify boundary structure.
 
-### 7b. `algorithms/planar/contour_state.py`
+### 8b. `algorithms/planar/contour_state.py`
 - Track the evolving outer contour during incremental vertex placement
 - Doubly-linked list of boundary vertices with efficient insert/delete
 - `ContourState`: init from base edge (v1, v2), then `add_vertex(vk, left, right)` to update boundary
 
-### 7c. `algorithms/planar/shift_structure.py`
+### 8c. `algorithms/planar/shift_structure.py`
 - Shift accumulator for Chrobak-Kant x-coordinate computation
 - Each vertex gets a relative x-shift; final coordinates computed by prefix sum
 
-### 7d. `geometry/planar/layout.py`
+### 8d. `geometry/planar/layout.py`
 - `chrobak_kant_layout(dm, outer_face=None) -> dict[int, tuple[int, int]]`
   - Full pipeline: triangulate → canonical order → shift-based placement
   - Returns integer grid coordinates for each vertex
@@ -603,20 +630,20 @@ Canonical ordering of a **triangulated** 3-connected planar graph (de Fraysseix,
 
 ---
 
-## Phase 8: Visualization (Planar)
+## Phase 9: Visualization (Planar)
 
-### 8a. `visualization/matplotlib_planar.py`
+### 9a. `visualization/matplotlib_planar.py`
 - `draw_planar_graph(dm, positions, ax=None)`: Draw edges as line segments, vertices as points
 - `draw_faces(dm, positions, ax=None, colors=None)`: Fill faces with color
 - Optional: label vertices, highlight orbits
 
 **Math:** None beyond coordinate indexing. Uses matplotlib patches/lines.
 
-### 8b. `visualization/svg_planar.py`
+### 9b. `visualization/svg_planar.py`
 - `render_svg(dm, positions) -> str`: Pure SVG string output (no matplotlib dependency)
 - Edges as `<line>`, vertices as `<circle>`, faces as `<polygon>`
 
-### 6c. `geometry/planar/kamada_kawai.py`
+### 9c. `geometry/planar/kamada_kawai.py`
 Arbitrary force-directed layout for use before any peeling step — needed as the "initial state" panel in the educational walkthrough.
 
 - `kamada_kawai_layout(dm) -> dict[int, tuple[float, float]]`: Classic Kamada-Kawai spring-model layout
@@ -628,7 +655,7 @@ Arbitrary force-directed layout for use before any peeling step — needed as th
 
 **Note:** This layout does not guarantee planarity or convexity — it is purely for visual clarity as an initial or "arbitrary" rendering before the canonical-ordering pipeline is applied.
 
-### 6d. `visualization/walkthrough.py` — Educational Split-Screen Walkthrough
+### 9d. `visualization/walkthrough.py` — Educational Split-Screen Walkthrough
 Step-by-step animated/interactive visualization of the canonical ordering algorithm:
 
 **Left panel — initial graph (Kamada-Kawai):** Show the input planar graph in an arbitrary readable layout, with the outer face and anchor vertices (v1, v2, vn) highlighted.
@@ -644,7 +671,7 @@ Step-by-step animated/interactive visualization of the canonical ordering algori
 - `render_walkthrough_matplotlib(frames, output_path=None)`: Render as a multi-panel matplotlib figure (one subplot per panel) or save an animated GIF/MP4 via `matplotlib.animation`.
 - `render_walkthrough_svg_sequence(frames, output_dir)`: Emit one SVG file per frame for embedding in documentation or a web slideshow.
 
-**Math:** No new math beyond Phase 5 — this phase only composes the canonical ordering (5a) and Chrobak-Kant layout (5d) with the Kamada-Kawai layout (6c) into a single narrated sequence.
+**Math:** No additional math beyond the layout algorithms already implemented in Phases 8 and 9c — this phase only composes the canonical ordering (8a), Chrobak-Kant layout (8d), and Kamada-Kawai layout (9c) into a single narrated sequence.
 
 ### Testing
 - Smoke test: generates valid SVG/matplotlib figure without error
@@ -662,9 +689,9 @@ Step-by-step animated/interactive visualization of the canonical ordering algori
 
 ---
 
-## Phase 9: Conway Operators
+## Phase 10: Conway Operators
 
-### 9a. `generators/conway.py`
+### 10a. `generators/conway.py`
 Each operator takes a DartMap and produces a new DartMap.
 
 Operators marked ★ are **primitive**: they are implemented directly and have
@@ -698,7 +725,7 @@ are enantiomorphs.
 darts/vertices/edges/faces to new face lists. The key insight is that all
 information is available from traversal — no geometry needed.
 
-#### 9b. Named composites (`generators/conway.py` continued)
+#### 10b. Named composites (`generators/conway.py` continued)
 
 These are algebraic: each is a composition of primitive operators.  Provide
 them as thin Python wrappers so callers can use idiomatic names without having
@@ -727,23 +754,23 @@ to chain calls by hand.
 
 ---
 
-## Phase 10: Polyhedral Realization (3D Geometry)
+## Phase 11: Polyhedral Realization (3D Geometry)
 
-### 10a. `geometry/polyhedral/face_planes.py`
+### 11a. `geometry/polyhedral/face_planes.py`
 - `FacePlaneParams`: Parameterize each face by a normal direction (2 spherical angles) + offset
 - `expand_face_planes(params) -> tuple[ndarray, ndarray]`: Convert to (normals, offsets)
 - `normal_from_spherical(phi, psi) -> ndarray`: Unit normal from angles
 
-### 10b. `geometry/polyhedral/vertex_recovery.py`
+### 11b. `geometry/polyhedral/vertex_recovery.py`
 - `recover_vertices(normals, offsets, dm) -> ndarray`: For each vertex, find the intersection of its incident face planes (least-squares solve of 3+ plane equations)
 
 **Math:** Each vertex is the intersection of ≥ 3 planes. Solve n_i · x = d_i as a linear system. For exactly 3 planes: direct 3×3 solve. For >3: least-squares via `numpy.linalg.lstsq`.
 
-### 10c. `geometry/polyhedral/initialization.py`
+### 11c. `geometry/polyhedral/initialization.py`
 - Initialize face plane parameters from known geometry (e.g., Platonic solid coordinates)
 - Or: random initialization with constraints (all normals pointing outward)
 
-### 10d. `geometry/polyhedral/optimizer.py`
+### 11d. `geometry/polyhedral/optimizer.py`
 - `realize(dm, symmetry=None) -> ndarray`: Find 3D vertex positions satisfying:
   - Faces are planar
   - Edges have roughly uniform length (edge_uniformity_energy)
@@ -762,14 +789,14 @@ to chain calls by hand.
 
 ---
 
-## Phase 11: Layout Refinement & Advanced Drawing
+## Phase 12: Layout Refinement & Advanced Drawing
 
-### 11a. `geometry/planar/refinement.py`
+### 12a. `geometry/planar/refinement.py`
 - `refine_planar_layout(positions, dm, generators=None) -> ndarray`: Post-process grid drawing with force-directed smoothing
 - `symmetry_energy(positions, generators)`: Penalize asymmetry
 - `angular_resolution_energy(positions, dm)`: Maximize minimum angle at vertices
 
-### 11b. `geometry/planar/layout.py` additions
+### 12b. `geometry/planar/layout.py` additions
 - `disk_link_layout(dm)`: Bekos et al. algorithm (constant edge-vertex resolution)
 
 ### Files
@@ -779,16 +806,15 @@ to chain calls by hand.
 
 ---
 
-## Phase 12: Export & Interop
+## Phase 13: Export & Interop
 
-### 12a. Export formats
+### 13a. Export formats
 - `export/obj.py`: Wavefront OBJ for 3D meshes (vertices + face indices)
 - `export/mesh_json.py`: JSON with vertices, faces, edges for web viewers
 - `export/planar_json.py`: JSON with 2D positions + graph structure
 - `export/svg.py`: Standalone SVG export
 
-### 12b. Interop
-- `interop/networkx_adapter.py`: Convert DartMap ↔ NetworkX graph (lose embedding info, keep adjacency)
+### 13b. Interop
 - `interop/ogdf_adapter.py`: Bridge to OGDF (Open Graph Drawing Framework) for advanced layout
   algorithms not implemented natively (e.g., orthogonal, hierarchical, force-directed).
   **Rationale:** OGDF is a mature C++ graph-drawing library with Python bindings (`pyogdf`).
@@ -805,13 +831,12 @@ to chain calls by hand.
 
 ### Files
 - `src/polygraph/export/*.py`
-- `src/polygraph/interop/networkx_adapter.py`
 - `src/polygraph/interop/ogdf_adapter.py`
 - `src/polygraph/structures/io.py`
 
 ---
 
-## Phase 13: 3D Visualization
+## Phase 14: 3D Visualization
 
 - `visualization/mesh_threejs.py`: Export three.js BufferGeometry JSON for web rendering
 - Optional: `visualization/matplotlib_3d.py` for quick 3D plots via mpl_toolkits.mplot3d
@@ -820,7 +845,7 @@ to chain calls by hand.
 
 ## Verification Strategy
 
-Each phase includes tests. The end-to-end pipeline test after Phase 8:
+Each phase includes tests. The end-to-end pipeline test after Phase 9:
 
 ```python
 from polygraph.generators.platonic import cube
@@ -839,7 +864,7 @@ frames = build_walkthrough_frames(tri_dm)
 render_walkthrough_matplotlib(frames, output_path="cube_walkthrough.gif")
 ```
 
-After Phase 10:
+After Phase 11:
 ```python
 from polygraph.geometry.polyhedral.optimizer import realize
 vertices_3d = realize(cube())
