@@ -16,18 +16,69 @@ PolyGraph is a research library for polyhedral topology built on combinatorial m
 
 **Why first:** Every subsequent layer needs concrete DartMaps to test against. Currently the only test fixture is a hand-built tetrahedron in test_traversal.py.
 
-### 1a. `generators/platonic.py`
-Each function returns `DartMap.from_face_lists(faces, n_vertices)`.
+### 1a. `generators/prisms.py`
+| Function | V | E | F | Notes |
+|---|---|---|---|---|
+| `prism(n)` | 2n | 3n | n+2 | Two n-gon caps + n quads; n≥3 |
+| `antiprism(n)` | 2n | 4n | 2n+2 | Two n-gon caps + 2n triangles; n≥3 for standard formula |
+
+**Math:** Parametric face generation from cyclic index arithmetic (mod n). The formulas above apply for n≥3. `antiprism(2)` is a degenerate case: the two digon "caps" collapse (a digon shares both its edges with adjacent triangles), yielding a tetrahedron with V=4, E=6, F=4 — not the V=4, E=8, F=6 the standard formula would predict. Implement `antiprism(2)` as an explicit special case.
+
+### 1b. `generators/platonic.py`
+Each function returns `DartMap.from_face_lists(faces, num_vertices)`.
 
 | Function | V | E | F | Face sizes | Math needed |
 |---|---|---|---|---|---|
-| `tetrahedron()` | 4 | 6 | 4 | all 3 | Enumerate 4 triangular faces |
-| `cube()` | 8 | 12 | 6 | all 4 | Enumerate 6 quad faces with consistent orientation |
-| `octahedron()` | 6 | 12 | 8 | all 3 | Dual of cube: 8 triangular faces |
+| `tetrahedron()` | 4 | 6 | 4 | all 3 | Delegate to `antiprism(2)` (special case — see §1a) |
+| `cube()` | 8 | 12 | 6 | all 4 | Delegate to `prism(4)` |
+| `octahedron()` | 6 | 12 | 8 | all 3 | Delegate to `antiprism(3)` |
 | `dodecahedron()` | 20 | 30 | 12 | all 5 | 12 pentagonal faces (use known vertex adjacency) |
 | `icosahedron()` | 12 | 30 | 20 | all 3 | 20 triangular faces |
 
 **Minimum math:** Just hardcoded oriented face lists. Verify via Euler characteristic (V - E + F = 2) and genus (0).
+
+### 1b. `generators/notation.py` — Schläfli & vertex-configuration symbols
+
+**Minimum foundation:** Only the already-complete traversal layer is needed — no geometry, no symmetry.
+
+**Schläfli symbol `{p, q}`** is defined only for *regular* polyhedra where every face is a p-gon and every vertex has degree q. Both values are read directly from the dart map:
+
+```python
+def schlafli_symbol(dm: DartMap) -> tuple[int, int]:
+    """Return (p, q) for a regular polyhedron, or raise ValueError if not regular."""
+    face_sizes = {len(list(face_darts(dm, f))) for f in all_face_orbits(dm)}
+    vertex_degrees = {len(list(vertex_darts(dm, v))) for v in all_vertex_orbits(dm)}
+    if len(face_sizes) != 1 or len(vertex_degrees) != 1:
+        raise ValueError("Not a regular polyhedron")
+    return face_sizes.pop(), vertex_degrees.pop()
+```
+
+| Solid | {p, q} |
+|---|---|
+| Tetrahedron | {3, 3} |
+| Cube | {4, 3} |
+| Octahedron | {3, 4} |
+| Dodecahedron | {5, 3} |
+| Icosahedron | {3, 5} |
+
+**Vertex-configuration string** generalizes to *semi-regular* (Archimedean) polyhedra and prisms, where different face sizes can appear around each vertex. For a given vertex v, walk around its face orbits in sigma-order and record face sizes:
+
+```python
+def vertex_configuration(dm: DartMap) -> str:
+    """Return the vertex-configuration string, e.g. '3.4.3.4' for cuboctahedron.
+    Raises ValueError if the configuration differs between vertices.
+    """
+```
+
+- For a prism(n): `4.4.n`
+- For an antiprism(n): `3.3.3.n`
+- Archimedean solids have uniform vertex configurations (same for every vertex)
+
+**Where this fits:** Can be added as part of Phase 1 testing/validation — once generators produce DartMaps, `schlafli_symbol()` and `vertex_configuration()` give a human-readable check of correctness that complements the numeric V/E/F assertions.
+
+**Files:**
+- `src/polygraph/generators/notation.py`
+- tests added to `tests/generators/test_platonic.py` and `tests/generators/test_prisms.py`
 
 ### 1b. `generators/prisms.py`
 | Function | V | E | F | Notes |
@@ -114,13 +165,14 @@ construction (`dual_of`) and Phase 9 Conway operators are complete; most can be 
 - Round-trip: `face_orbits()` recovers input faces (up to cyclic rotation)
 
 ### Files
-- `src/polygraph/generators/platonic.py`
 - `src/polygraph/generators/prisms.py`
+- `src/polygraph/generators/platonic.py`
 - `src/polygraph/generators/johnson.py`
 - `src/polygraph/generators/archimedean.py` (stubs only)
 - `src/polygraph/generators/catalan.py` (stubs only)
 - `tests/generators/test_platonic.py`
 - `tests/generators/test_prisms.py`
+- `tests/generators/test_platonic.py`
 
 ---
 
@@ -310,15 +362,59 @@ Start with Option B for research flexibility; add BLISS later.
 
 **Math:** Union-find on elements under generator action. For each generator g and element x, union x with g(x).
 
+### 7d. `algorithms/symmetry/wyckoff.py` — Wyckoff-style orbit labels
+
+**Minimum foundation:** Requires 7b–7c (automorphism generators + orbit partitions). No geometry needed — purely combinatorial.
+
+Wyckoff positions in crystallography label each distinct site orbit in a structure by a letter (`a`, `b`, `c`, …) ordered from highest-symmetry sites to lowest. The analogous concept for finite polyhedra labels each orbit of vertices, edges, and faces under the combinatorial automorphism group Aut(dm).
+
+**Why this is natural here:** once `vertex_orbits(generators, dm)` gives the partition into orbits, assigning letters and reporting the site-symmetry subgroup (stabiliser of a representative element) is straightforward.
+
+```python
+@dataclass
+class WyckoffSite:
+    label: str          # 'a', 'b', 'c', ... (restart separately per kind)
+    kind: str           # 'vertex' | 'edge' | 'face'
+    multiplicity: int   # number of elements in the orbit
+    stabilizer_order: int  # |Aut(dm)| / multiplicity
+
+def wyckoff_table(generators, dm) -> list[WyckoffSite]:
+    """Return Wyckoff-style orbit labels for vertices, edges, and faces.
+
+    The result is grouped by kind, and within each kind the orbits are
+    ordered by decreasing stabilizer order (highest symmetry first).
+    Labels restart from 'a' independently for vertices, edges, and faces,
+    so a highly symmetric solid typically has vertex 'a', edge 'a',
+    and face 'a' for its unique orbits of each kind.
+    """
+```
+
+The Schläfli-symbol and vertex-configuration functions from Phase 1d become fast consistency checks: a regular polyhedron `{p, q}` must have exactly one vertex orbit, one edge orbit, and one face orbit (all labelled `a`).
+
+**Example outputs:**
+
+| Solid | Vertex orbits | Edge orbits | Face orbits |
+|---|---|---|---|
+| Tetrahedron | a (×4) | a (×6) | a (×4) |
+| Cube | a (×8) | a (×12) | a (×6) |
+| Prism(5) | a (×5), b (×5) | a (×5), b (×10) | a (×2), b (×5) |
+
+**Files:**
+- `src/polygraph/algorithms/symmetry/wyckoff.py`
+- tests added to `tests/algorithms/test_symmetry.py`
+
 ### Testing
 - Tetrahedron: |Aut| = 24, 1 vertex orbit, 1 edge orbit, 1 face orbit
 - Cube: |Aut| = 48, 1 vertex orbit, 1 edge orbit, 1 face orbit
 - Prism(5): |Aut| = 20, 2 vertex orbits, 2 edge orbits, 2 face orbits
+- Wyckoff table for cube: 3 rows (vertex-a, edge-a, face-a), each multiplicity matches V/E/F
+- Wyckoff table for Prism(5): 6 rows covering the two vertex orbits, two edge orbits, two face orbits
 
 ### Files
 - `src/polygraph/interop/bliss_adapter.py` (or inline pure-Python)
 - `src/polygraph/algorithms/symmetry/automorphisms.py`
 - `src/polygraph/algorithms/symmetry/orbits.py`
+- `src/polygraph/algorithms/symmetry/wyckoff.py`
 - `tests/algorithms/test_symmetry.py`
 
 ---
@@ -429,11 +525,24 @@ Each operator takes a DartMap and produces a new DartMap.
 
 ### 12b. Interop
 - `interop/networkx_adapter.py`: Convert DartMap ↔ NetworkX graph (lose embedding info, keep adjacency)
+- `interop/ogdf_adapter.py`: Bridge to OGDF (Open Graph Drawing Framework) for advanced layout
+  algorithms not implemented natively (e.g., orthogonal, hierarchical, force-directed).
+  **Rationale:** OGDF is a mature C++ graph-drawing library with Python bindings (`pyogdf`).
+  The stub `src/polygraph/interop/ogdf_adapter.py` is already present as a placeholder.
+  The adapter converts a `DartMap` to an OGDF `Graph` + `GraphAttributes` object, delegates
+  layout computation to OGDF, and maps 2D position results back to dart indices. This remains
+  an optional dependency so the core library has no C++ requirement; it is activated only when
+  `pyogdf` is importable and may be exposed via a dedicated extras entry in `pyproject.toml`.
+  - `ogdf_to_dart_map(graph, graph_attrs) -> DartMap`: Import a laid-out OGDF graph
+  - `dart_map_to_ogdf(dm) -> tuple[Graph, GraphAttributes]`: Export for OGDF layout
+  - `apply_ogdf_layout(dm, algorithm="fmmm") -> dict[int, tuple[float, float]]`: Run a named
+    OGDF algorithm and return per-dart 2D positions
 - `structures/io.py`: Serialize/deserialize DartMap to JSON (face lists + vertex count)
 
 ### Files
 - `src/polygraph/export/*.py`
 - `src/polygraph/interop/networkx_adapter.py`
+- `src/polygraph/interop/ogdf_adapter.py`
 - `src/polygraph/structures/io.py`
 
 ---
