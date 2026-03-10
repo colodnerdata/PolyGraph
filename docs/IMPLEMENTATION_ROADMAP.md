@@ -113,7 +113,7 @@ Target Option A from the start; Option B is a compatibility fallback, not the pr
 - `classify_symmetry(generators, dm) -> str`: Match computed automorphism group against known point group templates
 - Uses group order + orbit structure to narrow candidates
 
-**Math:** Group order determines the family. |Aut|=24 on a solid with 1 vertex orbit → tetrahedral. |Aut|=48 → octahedral. |Aut|=120 → icosahedral. |Aut|=2n with 2 vertex orbits → dihedral D_n.
+**Math:** Group order determines the family. |Aut|=24 on a solid with 1 vertex orbit → tetrahedral. |Aut|=48 → octahedral. |Aut|=120 → icosahedral. |Aut|=4n with 2 vertex orbits → full dihedral (prism) symmetry, typically denoted D_nh (or D_nd). Restricting to orientation-preserving automorphisms gives order 2n (dihedral D_n).
 
 ### Files
 - `src/polygraph/algorithms/symmetry/point_groups.py`
