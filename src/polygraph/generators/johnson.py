@@ -4,7 +4,7 @@ Parametric generators for pyramid and bipyramid families, plus individual
 stubs for the Johnson solids that are convex deltahedra but have no simple
 parametric form.  Stubs raise ``NotImplementedError`` until implemented.
 
-Each function returns ``DartMap.from_face_lists(faces, num_vertices)``.
+Each function will return ``DartMap.from_face_lists(faces, num_vertices)``.
 """
 
 from __future__ import annotations
