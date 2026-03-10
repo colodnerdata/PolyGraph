@@ -98,7 +98,13 @@ def vertex_darts(dm: DartMap, d: int) -> Iterator[int]:
     IndexError
         If ``d`` is outside ``[0, dm.num_darts)``.
     """
-    yield from orbit(d, _sigma_permutation(dm))
+    dm.validate_dart(d)
+    cur = d
+    while True:
+        yield cur
+        cur = dm.sigma[cur]
+        if cur == d:
+            break
 
 
 def face_darts(dm: DartMap, d: int) -> Iterator[int]:
@@ -121,7 +127,11 @@ def face_darts(dm: DartMap, d: int) -> Iterator[int]:
     IndexError
         If ``d`` is outside ``[0, dm.num_darts)``.
     """
-    yield from orbit(d, _phi_permutation(dm))
+    dm.validate_dart(d)
+    # Build the face permutation once, then traverse it without repeated
+    # DartMap.phi() calls (which perform bounds checks on every step).
+    phi_perm = _phi_permutation(dm)
+    yield from orbit(d, phi_perm)
 
 
 def edge_darts(dm: DartMap, d: int) -> Iterator[int]:
@@ -144,7 +154,7 @@ def edge_darts(dm: DartMap, d: int) -> Iterator[int]:
     IndexError
         If ``d`` is outside ``[0, dm.num_darts)``.
     """
-    dm._check_dart(d)
+    dm.validate_dart(d)
     yield d
     yield dm.alpha[d]
 

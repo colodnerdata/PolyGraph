@@ -158,6 +158,24 @@ class DartMap:
         """
         return self.num_darts // 2
 
+    def validate_dart(self, d: int) -> None:
+        """Validate that a dart index is in range ``[0, num_darts)``.
+
+        Parameters
+        ----------
+        d : int
+            Dart index to validate.
+
+        Raises
+        ------
+        IndexError
+            If ``d`` is not in ``[0, num_darts)``.
+        """
+        if not 0 <= d < self.num_darts:
+            raise IndexError(
+                f"Dart index {d} out of range [0, {self.num_darts})."
+            )
+
     def _check_dart(self, d: int) -> None:
         """Validate that a dart index is in range.
 
@@ -171,8 +189,7 @@ class DartMap:
         IndexError
             If ``d`` is not in ``[0, num_darts)``.
         """
-        if not 0 <= d < self.num_darts:
-            raise IndexError(f"Dart index out of range: {d}.")
+        self.validate_dart(d)
 
     def phi(self, d: int) -> int:
         """Return the next dart around the incident face.
