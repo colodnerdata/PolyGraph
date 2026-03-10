@@ -285,10 +285,10 @@ Start with Option B for research flexibility; add BLISS later.
 ### 9a. `generators/conway.py`
 Each operator takes a DartMap and produces a new DartMap.
 
-Operators marked ★ are **non-algebraic** (primitive): they cannot be expressed as
-a composition of other operators and require their own combinatorial recipe.
-The rest are algebraic — they are defined purely as compositions and are provided
-as convenience wrappers.
+Operators marked ★ are **primitive**: they are implemented directly and have
+their own combinatorial recipe, even if an algebraic decomposition exists.
+The rest are **algebraic** — they are defined purely as compositions of other
+operators and are provided as convenience wrappers.
 
 #### Primitive operators
 
