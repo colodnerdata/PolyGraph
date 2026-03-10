@@ -222,7 +222,7 @@ Arbitrary force-directed layout for use before any peeling step — needed as th
   - Minimize total spring energy `E = Σ_{i<j} k_{ij}(|p_i - p_j| - l_{ij})²` via iterative vertex-by-vertex gradient descent (the standard Kamada-Kawai update rule)
   - Return floating-point 2D positions suitable for display or as a `positions` dict for `draw_planar_graph`
 
-**Math:** Spring constants `k_{ij} = K / d_{ij}²`; ideal lengths `l_{ij} = L · d_{ij}` where `d_{ij}` is the shortest-path distance, `K` and `L` are global scale parameters. Convergence criterion: `max |∂E/∂p_i|² < ε`.
+**Math:** Spring constants `k_{ij} = K / d_{ij}²`; ideal lengths `l_{ij} = L · d_{ij}` where `d_{ij}` is the shortest-path distance, `K` and `L` are global scale parameters. Convergence criterion: `max_i ‖∇_{p_i} E‖² < ε`, where `‖·‖` denotes the Euclidean norm on ℝ².
 
 **Note:** This layout does not guarantee planarity or convexity — it is purely for visual clarity as an initial or "arbitrary" rendering before the canonical-ordering pipeline is applied.
 
