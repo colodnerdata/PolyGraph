@@ -555,14 +555,49 @@ Canonical ordering of a **triangulated** 3-connected planar graph (de Fraysseix,
 - `render_svg(dm, positions) -> str`: Pure SVG string output (no matplotlib dependency)
 - Edges as `<line>`, vertices as `<circle>`, faces as `<polygon>`
 
+### 6c. `geometry/planar/kamada_kawai.py`
+Arbitrary force-directed layout for use before any peeling step — needed as the "initial state" panel in the educational walkthrough.
+
+- `kamada_kawai_layout(dm) -> dict[int, tuple[float, float]]`: Classic Kamada-Kawai spring-model layout
+  - Build ideal distances from graph-theoretic shortest paths (BFS on the adjacency induced by the DartMap)
+  - Minimize total spring energy `E = Σ_{i<j} k_{ij}(|p_i - p_j| - l_{ij})²` via iterative vertex-by-vertex gradient descent (the standard Kamada-Kawai update rule)
+  - Return floating-point 2D positions suitable for display or as a `positions` dict for `draw_planar_graph`
+
+**Math:** Spring constants `k_{ij} = K / d_{ij}²`; ideal lengths `l_{ij} = L · d_{ij}` where `d_{ij}` is the shortest-path distance, `K` and `L` are global scale parameters. Convergence criterion: `max_i ‖∇_{p_i} E‖² < ε`, where `‖·‖` denotes the Euclidean norm on ℝ².
+
+**Note:** This layout does not guarantee planarity or convexity — it is purely for visual clarity as an initial or "arbitrary" rendering before the canonical-ordering pipeline is applied.
+
+### 6d. `visualization/walkthrough.py` — Educational Split-Screen Walkthrough
+Step-by-step animated/interactive visualization of the canonical ordering algorithm:
+
+**Left panel — initial graph (Kamada-Kawai):** Show the input planar graph in an arbitrary readable layout, with the outer face and anchor vertices (v1, v2, vn) highlighted.
+
+**Right panel — canonical ordering buildup:** Replay the algorithm one step at a time:
+1. Start from the triangulated graph; highlight the current outer contour.
+2. Each frame removes the next vertex in peeling order from the right panel's view, coloring it to show its contiguous neighbor interval on the boundary.
+3. After all vertices are peeled, replay in reverse as the Chrobak-Kant layout places them one by one, updating integer grid coordinates in real time.
+
+**API:**
+- `build_walkthrough_frames(dm) -> list[WalkthroughFrame]`: Compute all frames (positions + highlights) without rendering.
+- `WalkthroughFrame`: dataclass holding `step_index`, `description`, `positions_left`, `positions_right`, `highlighted_vertex`, `contour_darts`.
+- `render_walkthrough_matplotlib(frames, output_path=None)`: Render as a multi-panel matplotlib figure (one subplot per panel) or save an animated GIF/MP4 via `matplotlib.animation`.
+- `render_walkthrough_svg_sequence(frames, output_dir)`: Emit one SVG file per frame for embedding in documentation or a web slideshow.
+
+**Math:** No new math beyond Phase 5 — this phase only composes the canonical ordering (5a) and Chrobak-Kant layout (5d) with the Kamada-Kawai layout (6c) into a single narrated sequence.
+
 ### Testing
 - Smoke test: generates valid SVG/matplotlib figure without error
 - Visual spot-check on cube, dodecahedron
+- `build_walkthrough_frames(cube())` produces exactly `n - 1` frames in total (where `n` is the total number of vertices): `n - 3` peeling/placement frames (one per interior vertex added in canonical order), plus 1 initial anchor-selection frame (highlighting vertices `v1`, `v2`, `vn`) and 1 final layout frame
+- Each frame's `positions_right` has integer coordinates after the placement phase
 
 ### Files
 - `src/polygraph/visualization/matplotlib_planar.py`
 - `src/polygraph/visualization/svg_planar.py`
+- `src/polygraph/geometry/planar/kamada_kawai.py`
+- `src/polygraph/visualization/walkthrough.py`
 - `tests/visualization/test_planar_viz.py`
+- `tests/visualization/test_walkthrough.py`
 
 ---
 
@@ -789,11 +824,16 @@ from polygraph.generators.platonic import cube
 from polygraph.algorithms.triangulation.augment import triangulate
 from polygraph.geometry.planar.layout import chrobak_kant_layout
 from polygraph.visualization.matplotlib_planar import draw_planar_graph
+from polygraph.visualization.walkthrough import build_walkthrough_frames, render_walkthrough_matplotlib
 
 dm = cube()
 tri_dm = triangulate(dm).dart_map
 positions = chrobak_kant_layout(tri_dm)
 draw_planar_graph(tri_dm, positions)
+
+# Educational walkthrough: split-screen peeling + buildup
+frames = build_walkthrough_frames(tri_dm)
+render_walkthrough_matplotlib(frames, output_path="cube_walkthrough.gif")
 ```
 
 After Phase 10:
