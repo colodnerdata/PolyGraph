@@ -29,7 +29,7 @@ Each function returns `DartMap.from_face_lists(faces, n_vertices)`.
 
 **Minimum math:** Just hardcoded oriented face lists. Verify via Euler characteristic (V - E + F = 2) and genus (0).
 
-### 1d. `generators/notation.py` — Schläfli & vertex-configuration symbols
+### 1b. `generators/notation.py` — Schläfli & vertex-configuration symbols
 
 **Minimum foundation:** Only the already-complete traversal layer is needed — no geometry, no symmetry.
 
