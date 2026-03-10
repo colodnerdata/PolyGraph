@@ -14,8 +14,8 @@ realizations while remaining independent of any coordinate system.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Sequence
 
 
 def _inverse_permutation(perm: Sequence[int]) -> list[int]:
@@ -158,6 +158,24 @@ class DartMap:
         """
         return self.num_darts // 2
 
+    def validate_dart(self, d: int) -> None:
+        """Validate that a dart index is in range ``[0, num_darts)``.
+
+        Parameters
+        ----------
+        d : int
+            Dart index to validate.
+
+        Raises
+        ------
+        IndexError
+            If ``d`` is not in ``[0, num_darts)``.
+        """
+        if not 0 <= d < self.num_darts:
+            raise IndexError(
+                f"Dart index {d} out of range [0, {self.num_darts})."
+            )
+
     def _check_dart(self, d: int) -> None:
         """Validate that a dart index is in range.
 
@@ -171,8 +189,7 @@ class DartMap:
         IndexError
             If ``d`` is not in ``[0, num_darts)``.
         """
-        if not 0 <= d < self.num_darts:
-            raise IndexError(f"Dart index out of range: {d}.")
+        self.validate_dart(d)
 
     def phi(self, d: int) -> int:
         """Return the next dart around the incident face.
@@ -302,7 +319,7 @@ class DartMap:
         return numerator // 2
 
     @classmethod
-    def from_face_lists(cls, faces: Sequence[Sequence[int]], num_vertices: int) -> "DartMap":
+    def from_face_lists(cls, faces: Sequence[Sequence[int]], num_vertices: int) -> DartMap:
         """Construct a map from oriented face vertex cycles.
 
         Parameters
