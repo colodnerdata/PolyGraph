@@ -134,12 +134,10 @@ def face_darts(dm: DartMap, d: int) -> Iterator[int]:
         raise IndexError(
             f"Dart index {d} out of range [0, {dm.num_darts})."
         )
-    cur = d
-    while True:
-        yield cur
-        cur = dm.phi(cur)
-        if cur == d:
-            break
+    # Build the face permutation once, then traverse it without repeated
+    # DartMap.phi() calls (which perform bounds checks on every step).
+    phi_perm = _phi_permutation(dm)
+    yield from orbit(d, phi_perm)
 
 
 def edge_darts(dm: DartMap, d: int) -> Iterator[int]:
