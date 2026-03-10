@@ -336,7 +336,7 @@ The Schläfli-symbol and vertex-configuration functions from Phase 1d become fas
 - Cube: |Aut| = 48, 1 vertex orbit, 1 edge orbit, 1 face orbit
 - Prism(5): |Aut| = 20, 2 vertex orbits, 2 edge orbits, 2 face orbits
 - Wyckoff table for cube: 3 rows (vertex-a, edge-a, face-a), each multiplicity matches V/E/F
-- Wyckoff table for Prism(5): 5 rows covering the two vertex orbits, two edge orbits, two face orbits
+- Wyckoff table for Prism(5): 6 rows covering the two vertex orbits, two edge orbits, two face orbits
 
 ### Files
 - `src/polygraph/interop/bliss_adapter.py` (or inline pure-Python)
