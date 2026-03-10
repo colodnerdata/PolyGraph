@@ -91,6 +91,7 @@ Target Option A from the start; Option B is a compatibility fallback, not the pr
 ### Testing
 - Tetrahedron: |Aut| = 24, 1 vertex orbit, 1 edge orbit, 1 face orbit
 - Cube: |Aut| = 48, 1 vertex orbit, 1 edge orbit, 1 face orbit
+- Icosahedron: |Aut| = 120, 1 vertex orbit, 1 edge orbit, 1 face orbit
 - Prism(5): |Aut| = 20, 2 vertex orbits, 2 edge orbits, 2 face orbits
 
 ### Files
