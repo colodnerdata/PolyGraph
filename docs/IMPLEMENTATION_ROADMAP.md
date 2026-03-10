@@ -16,14 +16,22 @@ PolyGraph is a research library for polyhedral topology built on combinatorial m
 
 **Why first:** Every subsequent layer needs concrete DartMaps to test against. Currently the only test fixture is a hand-built tetrahedron in test_traversal.py.
 
-### 1a. `generators/platonic.py`
-Each function returns `DartMap.from_face_lists(faces, n_vertices)`.
+### 1a. `generators/prisms.py`
+| Function | V | E | F | Notes |
+|---|---|---|---|---|
+| `prism(n)` | 2n | 3n | n+2 | Two n-gon caps + n quads; n≥3 |
+| `antiprism(n)` | 2n | 4n | 2n+2 | Two n-gon caps + 2n triangles; n≥3 for standard formula |
+
+**Math:** Parametric face generation from cyclic index arithmetic (mod n). The formulas above apply for n≥3. `antiprism(2)` is a degenerate case: the two digon "caps" collapse (a digon shares both its edges with adjacent triangles), yielding a tetrahedron with V=4, E=6, F=4 — not the V=4, E=8, F=6 the standard formula would predict. Implement `antiprism(2)` as an explicit special case.
+
+### 1b. `generators/platonic.py`
+Each function returns `DartMap.from_face_lists(faces, num_vertices)`.
 
 | Function | V | E | F | Face sizes | Math needed |
 |---|---|---|---|---|---|
-| `tetrahedron()` | 4 | 6 | 4 | all 3 | Enumerate 4 triangular faces |
-| `cube()` | 8 | 12 | 6 | all 4 | Enumerate 6 quad faces with consistent orientation |
-| `octahedron()` | 6 | 12 | 8 | all 3 | Dual of cube: 8 triangular faces |
+| `tetrahedron()` | 4 | 6 | 4 | all 3 | Delegate to `antiprism(2)` (special case — see §1a) |
+| `cube()` | 8 | 12 | 6 | all 4 | Delegate to `prism(4)` |
+| `octahedron()` | 6 | 12 | 8 | all 3 | Delegate to `antiprism(3)` |
 | `dodecahedron()` | 20 | 30 | 12 | all 5 | 12 pentagonal faces (use known vertex adjacency) |
 | `icosahedron()` | 12 | 30 | 20 | all 3 | 20 triangular faces |
 
@@ -96,11 +104,11 @@ Defer `cupola(n)` and `rotunda()` — they need more complex face winding.
 - Round-trip: `face_orbits()` recovers input faces (up to cyclic rotation)
 
 ### Files
-- `src/polygraph/generators/platonic.py`
 - `src/polygraph/generators/prisms.py`
+- `src/polygraph/generators/platonic.py`
 - `src/polygraph/generators/johnson.py`
-- `tests/generators/test_platonic.py`
 - `tests/generators/test_prisms.py`
+- `tests/generators/test_platonic.py`
 
 ---
 
