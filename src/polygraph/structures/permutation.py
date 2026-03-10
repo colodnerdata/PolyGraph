@@ -138,12 +138,17 @@ class Permutation:
         Raises
         ------
         IndexError
-            If ``start`` is invalid when the permutation is applied.
+            If ``start`` is outside ``[0, len(self))``.
 
         Notes
         -----
         This generator emits each orbit element exactly once in traversal order.
         """
+        n = len(self.mapping)
+        if not 0 <= start < n:
+            raise IndexError(
+                f"Start index {start} out of range for permutation of size {n}."
+            )
         i = start
         while True:
             yield i
@@ -194,7 +199,14 @@ class Permutation:
         -------
         Permutation
             Identity permutation on ``0..n-1``.
+
+        Raises
+        ------
+        ValueError
+            If ``n`` is negative.
         """
+        if n < 0:
+            raise ValueError(f"Domain size must be non-negative, got {n}.")
         return cls(tuple(range(n)))
 
     @classmethod

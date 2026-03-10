@@ -45,6 +45,35 @@ def test_orbit_raises_for_invalid_start_index() -> None:
         list(orbit(3, perm))
 
 
+def test_permutation_orbit_raises_for_invalid_start() -> None:
+    perm = Permutation.from_sequence([1, 2, 0])
+    with pytest.raises(IndexError):
+        list(perm.orbit(-1))
+    with pytest.raises(IndexError):
+        list(perm.orbit(3))
+
+
+def test_permutation_identity_raises_for_negative_n() -> None:
+    with pytest.raises(ValueError):
+        Permutation.identity(-1)
+
+
+def test_traversal_functions_raise_for_out_of_range_dart() -> None:
+    dm = _tetrahedron_map()
+    with pytest.raises(IndexError):
+        list(vertex_darts(dm, -1))
+    with pytest.raises(IndexError):
+        list(vertex_darts(dm, dm.num_darts))
+    with pytest.raises(IndexError):
+        list(face_darts(dm, -1))
+    with pytest.raises(IndexError):
+        list(face_darts(dm, dm.num_darts))
+    with pytest.raises(IndexError):
+        list(edge_darts(dm, -1))
+    with pytest.raises(IndexError):
+        list(edge_darts(dm, dm.num_darts))
+
+
 def test_vertex_face_and_edge_darts_are_consistent() -> None:
     dm = _tetrahedron_map()
     v_rep = next(all_vertex_orbits(dm))
