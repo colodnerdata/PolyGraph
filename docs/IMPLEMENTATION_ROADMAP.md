@@ -19,17 +19,17 @@ PolyGraph is a research library for polyhedral topology built on combinatorial m
 ### 1a. `generators/prisms.py`
 | Function | V | E | F | Notes |
 |---|---|---|---|---|
-| `prism(n)` | 2n | 3n | n+2 | Two n-gon caps + n quads |
-| `antiprism(n)` | 2n | 4n | 2n+2 | Two n-gon caps + 2n triangles |
+| `prism(n)` | 2n | 3n | n+2 | Two n-gon caps + n quads; n≥3 |
+| `antiprism(n)` | 2n | 4n | 2n+2 | Two n-gon caps + 2n triangles; n≥3 for standard formula |
 
-**Math:** Parametric face generation from cyclic index arithmetic (mod n).
+**Math:** Parametric face generation from cyclic index arithmetic (mod n). The formulas above apply for n≥3. `antiprism(2)` is a degenerate case: the two digon "caps" collapse (a digon shares both its edges with adjacent triangles), yielding a tetrahedron with V=4, E=6, F=4 — not the V=4, E=8, F=6 the standard formula would predict. Implement `antiprism(2)` as an explicit special case.
 
 ### 1b. `generators/platonic.py`
 Each function returns `DartMap.from_face_lists(faces, num_vertices)`.
 
 | Function | V | E | F | Face sizes | Math needed |
 |---|---|---|---|---|---|
-| `tetrahedron()` | 4 | 6 | 4 | all 3 | Delegate to `antiprism(2)` |
+| `tetrahedron()` | 4 | 6 | 4 | all 3 | Delegate to `antiprism(2)` (special case — see §1a) |
 | `cube()` | 8 | 12 | 6 | all 4 | Delegate to `prism(4)` |
 | `octahedron()` | 6 | 12 | 8 | all 3 | Delegate to `antiprism(3)` |
 | `dodecahedron()` | 20 | 30 | 12 | all 5 | 12 pentagonal faces (use known vertex adjacency) |
