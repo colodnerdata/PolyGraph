@@ -398,7 +398,7 @@ first (simplest), then `cupola(n)` (Phase 2+), then the full catalogue.
 - `src/polygraph/generators/catalan.py` (stubs only)
 - `tests/generators/test_platonic.py`
 - `tests/generators/test_prisms.py`
-- `tests/generators/test_platonic.py`
+
 
 ---
 
@@ -469,9 +469,9 @@ Target Option A from the start; Option B is a compatibility fallback, not the pr
 Dual map construction: swap vertex and face roles.
 
 ```
-dual_sigma = phi        (face walk becomes vertex rotation)
-dual_alpha = alpha      (edge involution unchanged)
-dual_phi   = sigma      (vertex rotation becomes face walk)
+dual_sigma = phi              (face walk becomes vertex rotation)
+dual_alpha = alpha            (edge involution unchanged)
+dual_phi   = phi⁻¹ ∘ alpha    (by definition: phi(d) = sigma⁻¹ ∘ alpha(d))
 ```
 
 - `dual_of(dm) -> DartMap`: Construct dual by reinterpreting permutations

@@ -2,7 +2,7 @@
 
 The 13 Catalan solids are the duals of the 13 Archimedean solids. Hardcoded
 implementations are deferred until Phase 2 dual construction (``dual_of``)
-and Phase 9 Conway operators are complete; most can then be derived via
+and Phase 10 Conway operators are complete; most can then be derived via
 ``dual_of(archimedean_solid())``.
 
 Each function will return ``DartMap.from_face_lists(faces, num_vertices)``.

@@ -3,7 +3,7 @@
 All 13 Archimedean solids are vertex-transitive with regular polygon faces.
 Several arise naturally from Conway operators on Platonic solids (truncate,
 ambo, expand, snub — see generators/conway.py), so hardcoded implementations
-are deferred until Phase 9 (Conway operators) is complete.
+are deferred until Phase 10 (Conway operators) is complete.
 
 Each function will return ``DartMap.from_face_lists(faces, num_vertices)``.
 """
