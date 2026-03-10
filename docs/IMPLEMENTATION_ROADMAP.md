@@ -67,8 +67,13 @@ Defer `cupola(n)` and `rotunda()` — they need more complex face winding.
 
 ### 2a. `interop/bliss_adapter.py`
 BLISS (and nauty) compute automorphism generators via canonical labeling — use them directly rather than brute-forcing:
-- **Option A (preferred):** Use `pynauty` or `python-bliss` bindings. Build a colored graph from the DartMap (vertex for each dart, edges for sigma/alpha) and call the library to obtain automorphism generators.
-- **Option B (fallback only):** Pure-Python backtracking with pruning for environments where BLISS/nauty are unavailable (viable for polyhedra ≤ 120 darts).
+- **Option A (preferred):** Use `pynauty` or `python-bliss` bindings. Build a graph from the DartMap in a way that uniquely encodes the permutations `sigma` and `alpha`:
+  - One vertex per dart.
+  - Encode `sigma` and `alpha` as distinct edge types so that any graph automorphism necessarily commutes with both permutations.
+  - If the backend supports directed and/or colored edges, use directed, edge-colored arcs: e.g., a directed edge of color `SIGMA` from `d` to `sigma(d)` and a directed edge of color `ALPHA` from `d` to `alpha(d)`.
+  - If the backend only supports undirected, uncolored graphs, use a gadget/vertex-coloring scheme that breaks the symmetry between `sigma` vs `sigma^{-1}` and between `sigma` vs `alpha` (for example, introduce intermediate “sigma-edge” and “alpha-edge” vertices with distinct colors, or split each dart into in/out variants per permutation). The crucial requirement is that the encoding does **not** admit extra symmetries beyond DartMap automorphisms.
+  - Call the library on this encoded graph to obtain automorphism generators and map them back to permutations on darts.
+- **Option B (fallback only):** Pure-Python backtracking with pruning for environments where BLISS/nauty are unavailable (viable for polyhedra ≤ 120 darts), using the **same DartMap→graph encoding** as in Option A so that the computed automorphism group matches the BLISS/nauty semantics.
 
 Target Option A from the start; Option B is a compatibility fallback, not the primary path. The well-understood Platonic solid examples (tetrahedron, cube, icosahedron) serve as validation against known group orders.
 
