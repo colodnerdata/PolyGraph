@@ -330,13 +330,14 @@ to chain calls by hand.
 | `meta(dm)` | `kis(join(dm))` | `m = kda` | Each face divided into triangles via edge-midpoints and face-centres |
 | `bevel(dm)` | `truncate(ambo(dm))` | `b = ta` | Each edge becomes a hexagonal face band |
 
-> **Note on `zip`:** `zip` is listed as primitive (★) above. Its algebraic identity
-> `z = d(k)` is a useful cross-check but the direct combinatorial recipe (subdivide
-> edges + recombine darts) is more efficient to implement directly.
+> **Note on `zip`:** `zip` is listed as primitive (★) above. Although it has the
+> algebraic identity `z = d(k)`, we still treat `zip` as a primitive operation and
+> implement it via a direct combinatorial recipe (subdivide edges + recombine darts),
+> using the identity only as a mathematical cross-check.
 
-**Non-algebraic summary:** `dual`, `ambo`, `kis`, `truncate`, `expand`,
-`snub`, `chamfer`, `whirl` are primitive (★).  `join`, `needle`, `ortho`,
-`meta`, `bevel` (and `zip` when implemented via composition) are algebraic.
+**Non-algebraic summary:** `dual`, `ambo`, `kis`, `truncate`, `expand`, `snub`,
+`chamfer`, `whirl`, `zip` are primitive (★).  `join`, `needle`, `ortho`, `meta`,
+`bevel` are algebraic.
 
 ### Files
 - `src/polygraph/generators/conway.py`
