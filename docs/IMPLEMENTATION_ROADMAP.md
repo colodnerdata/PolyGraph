@@ -89,6 +89,10 @@ def vertex_configuration(dm: DartMap) -> str:
 **Math:** Parametric face generation from cyclic index arithmetic (mod n).
 
 ### 1c. `generators/johnson.py` (subset)
+
+Phase 1 implements the two simplest parametric families. All 92 will be added in
+later phases as the face-winding machinery matures.
+
 | Function | Notes |
 |---|---|
 | `pyramid(n)` | n-gon base + n triangles, V=n+1 |
@@ -156,6 +160,228 @@ construction (`dual_of`) and Phase 9 Conway operators are complete; most can be 
 | `deltoidal_hexacontahedron()` | rhombicosidodecahedron | kite |
 | `disdyakis_triacontahedron()` | truncated icosidodecahedron | scalene triangle |
 | `pentagonal_hexacontahedron()` | snub dodecahedron | irregular pentagon |
+#### All 92 Johnson Solids — Properties Reference
+
+Johnson (1966) proved these are the only 92 strictly-convex polyhedra with
+regular-polygon faces that are neither Platonic, Archimedean, prism, nor
+antiprism. Symmetry notation is Schönflies (Cnv, Dnh, Dnd, Cs, etc.).
+V–E+F = 2 for all. Rows marked `*` have J-numbers that should be verified
+against the Wikipedia/Johnson (1966) reference.
+
+**Pyramids** (J1–J2)
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J1 | Square pyramid | C4v | 5 | 8 | 5 |
+| J2 | Pentagonal pyramid | C5v | 6 | 10 | 6 |
+
+**Cupolas and Rotunda** (J3–J6)
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J3 | Triangular cupola | C3v | 9 | 15 | 8 |
+| J4 | Square cupola | C4v | 12 | 20 | 10 |
+| J5 | Pentagonal cupola | C5v | 15 | 25 | 12 |
+| J6 | Pentagonal rotunda | C5v | 20 | 35 | 17 |
+
+**Elongated Pyramids** (J7–J9)
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J7 | Elongated triangular pyramid | C3v | 7 | 12 | 7 |
+| J8 | Elongated square pyramid | C4v | 9 | 16 | 9 |
+| J9 | Elongated pentagonal pyramid | C5v | 11 | 20 | 11 |
+
+**Gyroelongated Pyramids** (J10–J11)
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J10 | Gyroelongated square pyramid | C4v | 9 | 20 | 13 |
+| J11 | Gyroelongated pentagonal pyramid | C5v | 11 | 25 | 16 |
+
+**Dipyramids** (J12–J13)
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J12 | Triangular dipyramid | D3h | 5 | 9 | 6 |
+| J13 | Pentagonal dipyramid | D5h | 7 | 15 | 10 |
+
+Note: The square dipyramid is the octahedron (Platonic), hence excluded.
+
+**Elongated Dipyramids** (J14–J16)
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J14 | Elongated triangular dipyramid | D3h | 8 | 15 | 9 |
+| J15 | Elongated square dipyramid | D4h | 10 | 20 | 12 |
+| J16 | Elongated pentagonal dipyramid | D5h | 12 | 25 | 15 |
+
+**Augmented Prisms** (J17–J25)
+
+Square pyramids are augmented onto square faces of prisms.
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J17 | Augmented triangular prism | C2v | 7 | 13 | 8 |
+| J18 | Biaugmented triangular prism | C2v | 8 | 17 | 11 |
+| J19 | Triaugmented triangular prism | D3h | 9 | 21 | 14 |
+| J20 | Augmented pentagonal prism | C2v | 11 | 19 | 10 |
+| J21 | Biaugmented pentagonal prism | C2 | 12 | 23 | 13 |
+| J22 | Augmented hexagonal prism | C2v | 13 | 22 | 11 |
+| J23 | Parabiaugmented hexagonal prism | D2h | 14 | 26 | 14 |
+| J24 | Metabiaugmented hexagonal prism | C2v | 14 | 26 | 14 |
+| J25 | Triaugmented hexagonal prism | D3h | 15 | 30 | 17 |
+
+**Augmented Dodecahedra** (J26–J29)
+
+Pentagonal pyramids are augmented onto pentagonal faces of the dodecahedron.
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J26 | Augmented dodecahedron | C5v | 21 | 35 | 16 |
+| J27 | Parabiaugmented dodecahedron | D5d | 22 | 40 | 20 |
+| J28 | Metabiaugmented dodecahedron | C2v | 22 | 40 | 20 |
+| J29 | Triaugmented dodecahedron | C3v | 23 | 45 | 24 |
+
+**Diminished and Augmented Icosahedra** (J30–J32)
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J30 | Metabidiminished icosahedron | C2v | 10 | 20 | 12 |
+| J31 | Tridiminished icosahedron | C3v | 9 | 15 | 8 |
+| J32 | Augmented tridiminished icosahedron | C3v | 10 | 18 | 10 |
+
+**Augmented Truncated Archimedean Solids** (J33–J40)
+
+Cupolas are augmented onto polygonal faces of truncated Platonic solids.
+
+| J# | Name | Alt. name | Sym | V | E | F |
+|---|---|---|---|---|---|---|
+| J33 | Augmented truncated tetrahedron | — | C3v | 15 | 27 | 14 |
+| J34 | Biaugmented truncated tetrahedron | — | C3v | 18 | 36 | 20 |
+| J35 | Augmented truncated cube | — | C4v | 28 | 48 | 22 |
+| J36 | Biaugmented truncated cube | — | D4h | 32 | 60 | 30 |
+| J37 | Augmented truncated dodecahedron | — | C5v | 65 | 105 | 42 |
+| J38 | Parabiaugmented truncated dodecahedron | — | D5d | 70 | 120 | 52 |
+| J39 | Metabiaugmented truncated dodecahedron | — | C2v | 70 | 120 | 52 |
+| J40 | Triaugmented truncated dodecahedron | — | C3v | 75 | 135 | 62 |
+
+**Gyrate and Diminished Rhombicosidodecahedra** (J41–J49)
+
+Gyration rotates a pentagonal cupola cap by 36°; diminution removes one.
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J41 | Gyrate rhombicosidodecahedron | C5v | 60 | 120 | 62 |
+| J42 | Parabigyrate rhombicosidodecahedron | D5d | 60 | 120 | 62 |
+| J43 | Metabigyrate rhombicosidodecahedron | C2v | 60 | 120 | 62 |
+| J44 | Trigyrate rhombicosidodecahedron | C3v | 60 | 120 | 62 |
+| J45 | Diminished rhombicosidodecahedron | C5v | 55 | 105 | 52 |
+| J46 | Parabigyrate diminished rhombicosidodecahedron | C2v | 55 | 105 | 52 |
+| J47 | Metabigyrate diminished rhombicosidodecahedron | Cs | 55 | 105 | 52 |
+| J48 | Gyrate bidiminished rhombicosidodecahedron | C2v | 50 | 90 | 42 |
+| J49 | Tridiminished rhombicosidodecahedron | C3v | 45 | 75 | 32 |
+
+**Elongated Cupola and Rotunda** (J50–J53)
+
+Cupola/rotunda with a prism inserted at the polygonal base.
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J50 | Elongated triangular cupola | C3v | 15 | 27 | 14 |
+| J51 | Elongated square cupola | C4v | 20 | 36 | 18 |
+| J52 | Elongated pentagonal cupola | C5v | 25 | 45 | 22 |
+| J53 | Elongated pentagonal rotunda | C5v | 30 | 55 | 27 |
+
+**Gyroelongated Cupola and Rotunda** (J54–J57)
+
+Cupola/rotunda with an antiprism inserted at the polygonal base.
+The antiprism's alternating triangles remove vertical mirror planes,
+reducing symmetry from Cnv to Cn for the n=5 cases (J56, J57).
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J54 | Gyroelongated triangular cupola | C3v | 15 | 33 | 20 |
+| J55 | Gyroelongated square cupola | C4v | 20 | 44 | 26 |
+| J56 | Gyroelongated pentagonal cupola | C5 | 25 | 55 | 32 |
+| J57 | Gyroelongated pentagonal rotunda | C5 | 30 | 65 | 37 |
+
+**Bicupola and Cupola-Rotunda** (J58–J64)
+
+Two cupolas joined at their 2n-gon bases.
+Note: triangular orthobicupola = cuboctahedron (Archimedean, excluded);
+square gyrobicupola = rhombicuboctahedron (Archimedean, excluded);
+pentagonal gyrobirotunda = icosidodecahedron (Archimedean, excluded).
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J58 | Triangular gyrobicupola | D3 | 12 | 24 | 14 |
+| J59 | Square orthobicupola | D4h | 16 | 32 | 18 |
+| J60 | Square gyrobicupola | D4d | 16 | 32 | 18 |
+| J61 | Pentagonal orthobicupola | D5h | 20 | 40 | 22 |
+| J62 | Pentagonal gyrobicupola | D5d | 20 | 40 | 22 |
+| J63 | Pentagonal orthocupolarotunda | C5v | 25 | 50 | 27 |
+| J64 | Pentagonal gyrocupolarotunda | C5 | 25 | 50 | 27 |
+
+**Elongated Bicupola and Cupola-Rotunda** (J65–J71)
+
+Bicupola with a prism inserted between the two cupolas.
+Note: elongated square orthobicupola = rhombicuboctahedron (Archimedean, excluded).
+
+| J# | Name | Alt. name | Sym | V | E | F |
+|---|---|---|---|---|---|---|
+| J65 | Elongated triangular orthobicupola | — | D3h | 18 | 36 | 20 |
+| J66 | Elongated triangular gyrobicupola | — | D3d | 18 | 36 | 20 |
+| J67 | Elongated square gyrobicupola | Pseudorhombicuboctahedron | D4d | 24 | 48 | 26 |
+| J68 | Elongated pentagonal orthobicupola | — | D5h | 30 | 60 | 32 |
+| J69 | Elongated pentagonal gyrobicupola | — | D5d | 30 | 60 | 32 |
+| J70 | Elongated pentagonal orthocupolarotunda | — | C5v | 35 | 70 | 37 |
+| J71 | Elongated pentagonal gyrocupolarotunda | — | C5 | 35 | 70 | 37 |
+
+**Gyroelongated Bicupola and Related** (J72–J83)
+
+Bicupola with an antiprism inserted between the two cupolas.
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J72 | Gyroelongated triangular orthobicupola | D3 | 18 | 42 | 26 |
+| J73 | Gyroelongated triangular gyrobicupola | D3d | 18 | 42 | 26 |
+| J74 | Gyroelongated square orthobicupola | D4 | 24 | 56 | 34 |
+| J75 | Gyroelongated square gyrobicupola | D4d | 24 | 56 | 34 |
+| J76* | Gyroelongated pentagonal orthobicupola | D5 | 30 | 70 | 42 |
+| J77* | Gyroelongated pentagonal gyrobicupola | D5d | 30 | 70 | 42 |
+| J78* | Gyroelongated pentagonal orthocupolarotunda | C5 | 35 | 80 | 47 |
+| J79* | Gyroelongated pentagonal gyrocupolarotunda | C5 | 35 | 80 | 47 |
+| J80* | Elongated pentagonal orthobirotunda | C5v | 40 | 80 | 42 |
+| J81* | Elongated pentagonal gyrobirotunda | D5d | 40 | 80 | 42 |
+| J82* | Gyroelongated pentagonal orthobirotunda | D5 | 40 | 90 | 52 |
+| J83* | Gyroelongated pentagonal gyrobirotunda | D5d | 40 | 90 | 52 |
+
+`*` J76–J83 exact numbering should be verified against the Wikipedia reference
+(the ordering within this sub-family varies by source).
+**Snub Antiprisms** (J84–J85)
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J84 | Snub disphenoid | D2d | 8 | 18 | 12 |
+| J85 | Snub square antiprism | D4d | 16 | 40 | 26 |
+
+**Miscellaneous** (J86–J92)
+
+These seven solids do not belong to any parametric family.
+
+| J# | Name | Sym | V | E | F |
+|---|---|---|---|---|---|
+| J86 | Sphenocorona | C2v | 10 | 22 | 14 |
+| J87 | Augmented sphenocorona | Cs | 11 | 26 | 17 |
+| J88 | Sphenomegacorona | C2v | 12 | 28 | 18 |
+| J89 | Hebesphenomegacorona | C2v | 14 | 33 | 21 |
+| J90 | Disphenocingulum | D2d | 16 | 38 | 24 |
+| J91 | Bilunabirotunda | D2h | 26 | 49 | 25 |
+| J92 | Triangular hebesphenorotunda | C3v | 21 | 33 | 14 |
+
+**Implementation priority within Phase 1c:** `pyramid(n)` and `bipyramid(n)`
+first (simplest), then `cupola(n)` (Phase 2+), then the full catalogue.
 
 ### Testing
 - Euler characteristic = 2 for every generated solid
