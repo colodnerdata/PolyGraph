@@ -247,7 +247,7 @@ Step-by-step animated/interactive visualization of the canonical ordering algori
 ### Testing
 - Smoke test: generates valid SVG/matplotlib figure without error
 - Visual spot-check on cube, dodecahedron
-- `build_walkthrough_frames(cube())` produces exactly `n - 3` peeling frames (where `n` is the total number of vertices; one frame per interior vertex added in canonical order) plus 2 anchor frames
+- `build_walkthrough_frames(cube())` produces exactly `n - 1` frames in total (where `n` is the total number of vertices): `n - 3` peeling/placement frames (one per interior vertex added in canonical order), plus 1 initial anchor-selection frame (highlighting vertices `v1`, `v2`, `vn`) and 1 final layout frame
 - Each frame's `positions_right` has integer coordinates after the placement phase
 
 ### Files
