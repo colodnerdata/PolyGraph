@@ -671,7 +671,7 @@ Step-by-step animated/interactive visualization of the canonical ordering algori
 - `render_walkthrough_matplotlib(frames, output_path=None)`: Render as a multi-panel matplotlib figure (one subplot per panel) or save an animated GIF/MP4 via `matplotlib.animation`.
 - `render_walkthrough_svg_sequence(frames, output_dir)`: Emit one SVG file per frame for embedding in documentation or a web slideshow.
 
-**Math:** No new math beyond Phase 8 — this phase only composes the canonical ordering (8a) and Chrobak-Kant layout (8d) with the Kamada-Kawai layout (9c) into a single narrated sequence.
+**Math:** No additional math beyond the layout algorithms already implemented in Phases 8 and 9c — this phase only composes the canonical ordering (8a), Chrobak-Kant layout (8d), and Kamada-Kawai layout (9c) into a single narrated sequence.
 
 ### Testing
 - Smoke test: generates valid SVG/matplotlib figure without error
