@@ -37,129 +37,19 @@ Each function returns `DartMap.from_face_lists(faces, num_vertices)`.
 
 **Minimum math:** Just hardcoded oriented face lists. Verify via Euler characteristic (V - E + F = 2) and genus (0).
 
-### 1b. `generators/notation.py` — Schläfli & vertex-configuration symbols
-
-**Minimum foundation:** Only the already-complete traversal layer is needed — no geometry, no symmetry.
-
-**Schläfli symbol `{p, q}`** is defined only for *regular* polyhedra where every face is a p-gon and every vertex has degree q. Both values are read directly from the dart map:
-
-```python
-def schlafli_symbol(dm: DartMap) -> tuple[int, int]:
-    """Return (p, q) for a regular polyhedron, or raise ValueError if not regular."""
-    face_sizes = {len(list(face_darts(dm, f))) for f in all_face_orbits(dm)}
-    vertex_degrees = {len(list(vertex_darts(dm, v))) for v in all_vertex_orbits(dm)}
-    if len(face_sizes) != 1 or len(vertex_degrees) != 1:
-        raise ValueError("Not a regular polyhedron")
-    return face_sizes.pop(), vertex_degrees.pop()
-```
-
-| Solid | {p, q} |
-|---|---|
-| Tetrahedron | {3, 3} |
-| Cube | {4, 3} |
-| Octahedron | {3, 4} |
-| Dodecahedron | {5, 3} |
-| Icosahedron | {3, 5} |
-
-**Vertex-configuration string** generalizes to *semi-regular* (Archimedean) polyhedra and prisms, where different face sizes can appear around each vertex. For a given vertex v, walk around its face orbits in sigma-order and record face sizes:
-
-```python
-def vertex_configuration(dm: DartMap) -> str:
-    """Return the vertex-configuration string, e.g. '3.4.3.4' for cuboctahedron.
-    Raises ValueError if the configuration differs between vertices.
-    """
-```
-
-- For a prism(n): `4.4.n`
-- For an antiprism(n): `3.3.3.n`
-- Archimedean solids have uniform vertex configurations (same for every vertex)
-
-**Where this fits:** Can be added as part of Phase 1 testing/validation — once generators produce DartMaps, `schlafli_symbol()` and `vertex_configuration()` give a human-readable check of correctness that complements the numeric V/E/F assertions.
-
-**Files:**
-- `src/polygraph/generators/notation.py`
-- tests added to `tests/generators/test_platonic.py` and `tests/generators/test_prisms.py`
-
-### 1b. `generators/prisms.py`
-| Function | V | E | F | Notes |
-|---|---|---|---|---|
-| `prism(n)` | 2n | 3n | n+2 | Two n-gon caps + n quads |
-| `antiprism(n)` | 2n | 4n | 2n+2 | Two n-gon caps + 2n triangles |
-
-**Math:** Parametric face generation from cyclic index arithmetic (mod n).
-
 ### 1c. `generators/johnson.py` (subset)
 
-Phase 1 implements the two simplest parametric families. All 92 will be added in
-later phases as the face-winding machinery matures.
+Within Phase 1, only implement the two simplest parametric families. All 92 will be added in
+later phases as the face-winding machinery matures. Pyramid(4) and Pyramid(5) are Johnson solids.
+Dipyramid(3) and Dipyramid(4) are Johnson solids. Dipyramid(4) is the octahedron, which is Platonic as already noted.
 
 | Function | Notes |
 |---|---|
 | `pyramid(n)` | n-gon base + n triangles, V=n+1 |
-| `bipyramid(n)` | 2n triangles, V=n+2 |
+| `dipyramid(n)` | 2n triangles, V=n+2 |
 
 Defer `cupola(n)` and `rotunda()` — they need more complex face winding.
 
-### 1d. Convex Deltahedra — Coverage Confirmed
-
-All 8 convex deltahedra (polyhedra whose faces are all equilateral triangles) are covered by
-existing generators:
-
-- **3 Platonic:** tetrahedron, octahedron, icosahedron (`platonic.py`)
-- **2 via `bipyramid(n)`:** triangular bipyramid (J12, n=3), pentagonal bipyramid (J13, n=5)
-- **3 remaining Johnson deltahedra** — add as individual stubs in `johnson.py` (defer
-  implementation; hardcoded face lists required, no simple parametric form):
-
-| Function | Johnson # | V | E | F |
-|---|---|---|---|---|
-| `snub_disphenoid()` | J84 | 8 | 18 | 12 |
-| `triaugmented_triangular_prism()` | J51 | 9 | 21 | 14 |
-| `gyroelongated_square_bipyramid()` | J17 | 10 | 24 | 16 |
-
-### 1e. `generators/archimedean.py` (stub — defer)
-
-The 13 Archimedean solids are vertex-transitive with regular polygon faces. Several arise
-naturally from Conway operators on Platonic solids (`truncate`, `ambo`, `expand`, `snub` —
-Phase 10), so defer hardcoded implementations until Phase 10 is complete. Add function stubs
-with `raise NotImplementedError` now so call sites can be written.
-
-| Function | Vertex config | V | E | F |
-|---|---|---|---|---|
-| `truncated_tetrahedron()` | 3.6.6 | 12 | 18 | 8 |
-| `cuboctahedron()` | 3.4.3.4 | 12 | 24 | 14 |
-| `truncated_cube()` | 3.8.8 | 24 | 36 | 14 |
-| `truncated_octahedron()` | 4.6.6 | 24 | 36 | 14 |
-| `rhombicuboctahedron()` | 3.4.4.4 | 24 | 48 | 26 |
-| `truncated_cuboctahedron()` | 4.6.8 | 48 | 72 | 26 |
-| `snub_cube()` | 3.3.3.3.4 | 24 | 60 | 38 |
-| `icosidodecahedron()` | 3.5.3.5 | 30 | 60 | 32 |
-| `truncated_dodecahedron()` | 3.10.10 | 60 | 90 | 32 |
-| `truncated_icosahedron()` | 5.6.6 | 60 | 90 | 32 |
-| `rhombicosidodecahedron()` | 3.4.5.4 | 60 | 120 | 62 |
-| `truncated_icosidodecahedron()` | 4.6.10 | 120 | 180 | 62 |
-| `snub_dodecahedron()` | 3.3.3.3.5 | 60 | 150 | 92 |
-
-### 1f. `generators/catalan.py` (stub — defer)
-
-The 13 Catalan solids are the duals of the Archimedean solids. Defer until Phase 2 dual
-construction (`dual_of`) and Phase 10 Conway operators are complete; most can be derived via
-`dual_of(archimedean_solid())`. Add function stubs with `raise NotImplementedError` now.
-
-| Function | Dual of | Face type |
-|---|---|---|
-| `triakis_tetrahedron()` | truncated tetrahedron | isosceles triangle |
-| `rhombic_dodecahedron()` | cuboctahedron | rhombus |
-| `triakis_octahedron()` | truncated cube | isosceles triangle |
-| `tetrakis_hexahedron()` | truncated octahedron | isosceles triangle |
-| `deltoidal_icositetrahedron()` | rhombicuboctahedron | kite |
-| `disdyakis_dodecahedron()` | truncated cuboctahedron | scalene triangle |
-| `pentagonal_icositetrahedron()` | snub cube | irregular pentagon |
-| `rhombic_triacontahedron()` | icosidodecahedron | rhombus |
-| `triakis_icosahedron()` | truncated dodecahedron | isosceles triangle |
-| `pentakis_dodecahedron()` | truncated icosahedron | isosceles triangle |
-| `deltoidal_hexacontahedron()` | rhombicosidodecahedron | kite |
-| `disdyakis_triacontahedron()` | truncated icosidodecahedron | scalene triangle |
-| `pentagonal_hexacontahedron()` | snub dodecahedron | irregular pentagon |
 #### All 92 Johnson Solids — Properties Reference
 
 Johnson (1966) proved these are the only 92 strictly-convex polyhedra with
@@ -380,6 +270,67 @@ These seven solids do not belong to any parametric family.
 | J91 | Bilunabirotunda | D2h | 26 | 49 | 25 |
 | J92 | Triangular hebesphenorotunda | C3v | 21 | 33 | 14 |
 
+### 1d. Convex Deltahedra — Coverage Confirmed
+
+All 8 convex deltahedra (polyhedra whose faces are all equilateral triangles) are covered by
+existing generators:
+
+- **3 Platonic:** tetrahedron, octahedron, icosahedron (`platonic.py`)
+- **2 via `bipyramid(n)`:** triangular bipyramid (J12, n=3), pentagonal bipyramid (J13, n=5)
+- **3 remaining Johnson deltahedra** — add as individual stubs in `johnson.py` (defer
+  implementation; hardcoded face lists required, no simple parametric form):
+
+| Function | Johnson # | V | E | F |
+|---|---|---|---|---|
+| `snub_disphenoid()` | J84 | 8 | 18 | 12 |
+| `triaugmented_triangular_prism()` | J51 | 9 | 21 | 14 |
+| `gyroelongated_square_bipyramid()` | J17 | 10 | 24 | 16 |
+
+### 1e. `generators/archimedean.py` (stub — defer)
+
+The 13 Archimedean solids are vertex-transitive with regular polygon faces. Several arise
+naturally from Conway operators on Platonic solids (`truncate`, `ambo`, `expand`, `snub` —
+Phase 10), so defer hardcoded implementations until Phase 10 is complete. Add function stubs
+with `raise NotImplementedError` now so call sites can be written.
+
+| Function | Vertex config | V | E | F |
+|---|---|---|---|---|
+| `truncated_tetrahedron()` | 3.6.6 | 12 | 18 | 8 |
+| `cuboctahedron()` | 3.4.3.4 | 12 | 24 | 14 |
+| `truncated_cube()` | 3.8.8 | 24 | 36 | 14 |
+| `truncated_octahedron()` | 4.6.6 | 24 | 36 | 14 |
+| `rhombicuboctahedron()` | 3.4.4.4 | 24 | 48 | 26 |
+| `truncated_cuboctahedron()` | 4.6.8 | 48 | 72 | 26 |
+| `snub_cube()` | 3.3.3.3.4 | 24 | 60 | 38 |
+| `icosidodecahedron()` | 3.5.3.5 | 30 | 60 | 32 |
+| `truncated_dodecahedron()` | 3.10.10 | 60 | 90 | 32 |
+| `truncated_icosahedron()` | 5.6.6 | 60 | 90 | 32 |
+| `rhombicosidodecahedron()` | 3.4.5.4 | 60 | 120 | 62 |
+| `truncated_icosidodecahedron()` | 4.6.10 | 120 | 180 | 62 |
+| `snub_dodecahedron()` | 3.3.3.3.5 | 60 | 150 | 92 |
+
+### 1f. `generators/catalan.py` (stub — defer)
+
+The 13 Catalan solids are the duals of the Archimedean solids. Defer until Phase 2 dual
+construction (`dual_of`) and Phase 10 Conway operators are complete; most can be derived via
+`dual_of(archimedean_solid())`. Add function stubs with `raise NotImplementedError` now.
+
+| Function | Dual of | Face type |
+|---|---|---|
+| `triakis_tetrahedron()` | truncated tetrahedron | isosceles triangle |
+| `rhombic_dodecahedron()` | cuboctahedron | rhombus |
+| `triakis_octahedron()` | truncated cube | isosceles triangle |
+| `tetrakis_hexahedron()` | truncated octahedron | isosceles triangle |
+| `deltoidal_icositetrahedron()` | rhombicuboctahedron | kite |
+| `disdyakis_dodecahedron()` | truncated cuboctahedron | scalene triangle |
+| `pentagonal_icositetrahedron()` | snub cube | irregular pentagon |
+| `rhombic_triacontahedron()` | icosidodecahedron | rhombus |
+| `triakis_icosahedron()` | truncated dodecahedron | isosceles triangle |
+| `pentakis_dodecahedron()` | truncated icosahedron | isosceles triangle |
+| `deltoidal_hexacontahedron()` | rhombicosidodecahedron | kite |
+| `disdyakis_triacontahedron()` | truncated icosidodecahedron | scalene triangle |
+| `pentagonal_hexacontahedron()` | snub dodecahedron | irregular pentagon |
+
 **Implementation priority within Phase 1c:** `pyramid(n)` and `bipyramid(n)`
 first (simplest), then `cupola(n)` (Phase 2+), then the full catalogue.
 
@@ -399,7 +350,46 @@ first (simplest), then `cupola(n)` (Phase 2+), then the full catalogue.
 - `tests/generators/test_platonic.py`
 - `tests/generators/test_prisms.py`
 
+### 1g. `generators/notation.py` — Schläfli & vertex-configuration symbols
 
+**Minimum foundation:** Only the already-complete traversal layer is needed — no geometry, no symmetry.
+
+**Schläfli symbol `{p, q}`** is defined only for *regular* polyhedra where every face is a p-gon and every vertex has degree q. Both values are read directly from the dart map:
+
+```python
+def schlafli_symbol(dm: DartMap) -> tuple[int, int]:
+    """Return (p, q) for a regular polyhedron, or raise ValueError if not regular."""
+    face_sizes = {len(list(face_darts(dm, f))) for f in all_face_orbits(dm)}
+    vertex_degrees = {len(list(vertex_darts(dm, v))) for v in all_vertex_orbits(dm)}
+    if len(face_sizes) != 1 or len(vertex_degrees) != 1:
+        raise ValueError("Not a regular polyhedron")
+    return face_sizes.pop(), vertex_degrees.pop()
+```
+
+| Solid | {p, q} |
+|---|---|
+| Tetrahedron | {3, 3} |
+| Cube | {4, 3} |
+| Octahedron | {3, 4} |
+| Dodecahedron | {5, 3} |
+| Icosahedron | {3, 5} |
+
+**Vertex-configuration string** generalizes to *semi-regular* (Archimedean) polyhedra and prisms, where different face sizes can appear around each vertex. For a given vertex v, walk around its face orbits in sigma-order and record face sizes:
+
+```python
+def vertex_configuration(dm: DartMap) -> str:
+    """Return the vertex-configuration string, e.g. '3.4.3.4' for cuboctahedron.
+    Raises ValueError if the configuration differs between vertices.
+    """
+```
+
+- For a prism(n): `4.4.n`
+- For an antiprism(n): `3.3.3.n`
+- Archimedean solids have uniform vertex configurations (same for every vertex)
+
+**Files:**
+- `src/polygraph/generators/notation.py`
+- tests added to `tests/generators/test_platonic.py` and `tests/generators/test_prisms.py`
 ---
 
 ## Phase 2: Symmetry Detection
