@@ -705,18 +705,59 @@ The Schläfli-symbol and vertex-configuration functions from Phase 1d become fas
 ### 9a. `generators/conway.py`
 Each operator takes a DartMap and produces a new DartMap.
 
-| Operator | Effect | New V, E, F |
-|---|---|---|
-| `dual(dm)` | Swap vertices/faces | F, E, V |
-| `kis(dm)` | Raise pyramids on faces | V+F, 3E, 2E (if triangulated) |
-| `truncate(dm)` | Cut vertices | ... |
-| `ambo(dm)` | Midpoints of edges become vertices | E, 2E, V+F |
-| `expand(dm)` | ambo(ambo) | ... |
-| `snub(dm)` | Expand + triangulate gaps | ... |
+Operators marked ★ are **primitive**: they are implemented directly and have
+their own combinatorial recipe, even if an algebraic decomposition exists.
+The rest are **algebraic** — they are defined purely as compositions of other
+operators and are provided as convenience wrappers.
 
-**Implementation:** Build new face lists from the old DartMap's combinatorial structure, then call `from_face_lists()`. The dual can delegate to `structures/dual.py`.
+#### Primitive operators
 
-**Math:** Each operator is defined by a recipe that maps old darts/vertices/edges/faces to new face lists. The key insight is that all information is available from traversal — no geometry needed.
+All formulas are for genus-0 maps; V′−E′+F′=2 holds throughout.
+
+| Operator | Conway | Effect | New V′, E′, F′ |
+|---|---|---|---|
+| `dual(dm)` ★ | `d` | Swap vertices/faces | F, E, V |
+| `ambo(dm)` ★ | `a` | Edge midpoints become vertices | E, 2E, V+F |
+| `kis(dm)` ★ | `k` | Add apex to each face (kleetope) | V+F, 3E, 2E |
+| `truncate(dm)` ★ | `t` | Cut each vertex into a small face | 2E, 3E, V+F |
+| `expand(dm)` ★ | `e` | Separate faces; fill gaps with quads | 2E, 4E, V+E+F |
+| `snub(dm)` ★ | `s` | Chiral twist; fill gaps with triangles | 2E, 5E, 2+3E |
+| `zip(dm)` ★ | `z` | Dual of kis; each edge → two quads | 2E, 3E, V+F |
+| `chamfer(dm)` ★ | `c` | Replace each edge with a hexagonal band | V+2E, 4E, F+E |
+| `whirl(dm)` ★ | `w` | Chiral chamfer with a rotational twist | V+4E, 7E, F+2E |
+
+**Implementation:** Build new face lists from the old DartMap's combinatorial
+structure, then call `from_face_lists()`. The dual can delegate to
+`structures/dual.py`.  For `snub` and `whirl` (chiral), the recipe must choose
+a consistent orientation (left- or right-hand twist) and the two chiralities
+are enantiomorphs.
+
+**Math:** Each operator is defined by a recipe that maps old
+darts/vertices/edges/faces to new face lists. The key insight is that all
+information is available from traversal — no geometry needed.
+
+#### 9b. Named composites (`generators/conway.py` continued)
+
+These are algebraic: each is a composition of primitive operators.  Provide
+them as thin Python wrappers so callers can use idiomatic names without having
+to chain calls by hand.
+
+| Function | Definition | Conway | Effect |
+|---|---|---|---|
+| `join(dm)` | `dual(ambo(dm))` | `j = da` | Edges become quads; one quad per original edge |
+| `needle(dm)` | `dual(truncate(dm))` | `n = dt` | Dual of truncate; each face triangulated from centre |
+| `ortho(dm)` | `join(ambo(dm))` | `o = daa` | Each face subdivided into quads; all-quad result |
+| `meta(dm)` | `kis(join(dm))` | `m = kda` | Each face divided into triangles via edge-midpoints and face-centres |
+| `bevel(dm)` | `truncate(ambo(dm))` | `b = ta` | Each edge becomes a hexagonal face band |
+
+> **Note on `zip`:** `zip` is listed as primitive (★) above. Although it has the
+> algebraic identity `z = d(k)`, we still treat `zip` as a primitive operation and
+> implement it via a direct combinatorial recipe (subdivide edges + recombine darts),
+> using the identity only as a mathematical cross-check.
+
+**Non-algebraic summary:** `dual`, `ambo`, `kis`, `truncate`, `expand`, `snub`,
+`chamfer`, `whirl`, `zip` are primitive (★).  `join`, `needle`, `ortho`, `meta`,
+`bevel` are algebraic.
 
 ### Files
 - `src/polygraph/generators/conway.py`
