@@ -425,7 +425,6 @@ Each phase includes tests. The end-to-end pipeline test after Phase 6:
 from polygraph.generators.platonic import cube
 from polygraph.algorithms.triangulation.augment import triangulate
 from polygraph.geometry.planar.layout import chrobak_kant_layout
-from polygraph.geometry.planar.kamada_kawai import kamada_kawai_layout
 from polygraph.visualization.matplotlib_planar import draw_planar_graph
 from polygraph.visualization.walkthrough import build_walkthrough_frames, render_walkthrough_matplotlib
 
