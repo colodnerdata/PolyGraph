@@ -99,7 +99,7 @@ Defer `cupola(n)` and `rotunda()` — they need more complex face winding.
 ### 1d. Convex Deltahedra — Coverage Confirmed
 
 All 8 convex deltahedra (polyhedra whose faces are all equilateral triangles) are covered by
-existing generators — no additional entries are needed:
+existing generators:
 
 - **3 Platonic:** tetrahedron, octahedron, icosahedron (`platonic.py`)
 - **2 via `bipyramid(n)`:** triangular bipyramid (J12, n=3), pentagonal bipyramid (J13, n=5)
