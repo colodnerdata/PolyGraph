@@ -402,9 +402,70 @@ first (simplest), then `cupola(n)` (Phase 2+), then the full catalogue.
 
 ---
 
-## Phase 2: Structure Completions — Dual & Validation
+## Phase 2: Symmetry Detection
 
-### 2a. `structures/dual.py`
+**Why now:** Symmetry detection depends only on the DartMap structure and the generators from Phase 1. Establishing the automorphism pipeline early enables symmetry-constrained optimization in later phases (geometry, layout refinement) and provides a clean validation target using well-understood Platonic solid symmetry groups.
+
+### 2a. `interop/bliss_adapter.py`
+BLISS (and nauty) compute automorphism generators via canonical labeling — use them directly rather than brute-forcing:
+- **Option A (preferred):** Use `pynauty` or `python-bliss` bindings. Build a graph from the DartMap in a way that uniquely encodes the permutations `sigma` and `alpha`:
+  - One vertex per dart.
+  - Encode `sigma` and `alpha` as distinct edge types so that any graph automorphism necessarily commutes with both permutations.
+  - If the backend supports directed and/or colored edges, use directed, edge-colored arcs: e.g., a directed edge of color `SIGMA` from `d` to `sigma(d)` and a directed edge of color `ALPHA` from `d` to `alpha(d)`.
+  - If the backend only supports undirected, uncolored graphs, use a gadget/vertex-coloring scheme that breaks the symmetry between `sigma` vs `sigma^{-1}` and between `sigma` vs `alpha` (for example, introduce intermediate “sigma-edge” and “alpha-edge” vertices with distinct colors, or split each dart into in/out variants per permutation). The crucial requirement is that the encoding does **not** admit extra symmetries beyond DartMap automorphisms.
+  - Call the library on this encoded graph to obtain automorphism generators and map them back to permutations on darts.
+- **Option B (fallback only):** Pure-Python backtracking with pruning for environments where BLISS/nauty are unavailable (viable for polyhedra ≤ 120 darts), using the **same DartMap→graph encoding** as in Option A so that the computed automorphism group matches the BLISS/nauty semantics.
+
+Target Option A from the start; Option B is a compatibility fallback, not the primary path. The well-understood Platonic solid examples (tetrahedron, cube, icosahedron) serve as validation against known group orders.
+
+### 2b. `algorithms/symmetry/automorphisms.py`
+- `compute_automorphism_generators(dm) -> list[Permutation]`: Return generating set for Aut(dm)
+- `automorphism_group_order(generators, num_darts) -> int`: Compute |Aut(dm)| via Schreier-Sims or orbit-counting
+- `is_orientation_preserving(pi, dm) -> bool`: Check if automorphism preserves face orientation
+
+### 2c. `algorithms/symmetry/orbits.py`
+- `compute_orbits(generators, n) -> list[list[int]]`: General orbit computation under a permutation group
+- `dart_orbits(generators, dm)`, `vertex_orbits(generators, dm)`, `edge_orbits(generators, dm)`, `face_orbits(generators, dm)`: Derived orbit partitions
+
+**Math:** Union-find on elements under generator action. For each generator g and element x, union x with g(x).
+
+### Testing
+- Tetrahedron: |Aut| = 24, 1 vertex orbit, 1 edge orbit, 1 face orbit
+- Cube: |Aut| = 48, 1 vertex orbit, 1 edge orbit, 1 face orbit
+- Icosahedron: |Aut| = 120, 1 vertex orbit, 1 edge orbit, 1 face orbit
+- Prism(5): |Aut| = 20, 2 vertex orbits, 2 edge orbits, 2 face orbits
+
+### Files
+- `src/polygraph/interop/bliss_adapter.py`
+- `src/polygraph/algorithms/symmetry/automorphisms.py`
+- `src/polygraph/algorithms/symmetry/orbits.py`
+- `tests/algorithms/test_symmetry.py`
+
+---
+
+## Phase 3: Symmetry Classification & Point Groups
+
+### 3a. `algorithms/symmetry/point_groups.py`
+- Define point group templates as named tuples: `(name, order, generators_pattern)`
+- Families: C_n, D_n, T, O, I (and their variants with reflections)
+- `cyclic(n)`, `dihedral(n)`, `tetrahedral()`, `octahedral()`, `icosahedral()`
+
+### 3b. `algorithms/symmetry/classify.py`
+- `classify_symmetry(generators, dm) -> str`: Match computed automorphism group against known point group templates
+- Uses group order + orbit structure to narrow candidates
+
+**Math:** Group order determines the family. |Aut|=24 on a solid with 1 vertex orbit → tetrahedral. |Aut|=48 → octahedral. |Aut|=120 → icosahedral. |Aut|=4n with 2 vertex orbits → full dihedral (prism) symmetry, typically denoted D_nh (or D_nd). Restricting to orientation-preserving automorphisms gives order 2n (dihedral D_n).
+
+### Files
+- `src/polygraph/algorithms/symmetry/point_groups.py`
+- `src/polygraph/algorithms/symmetry/classify.py`
+- `tests/algorithms/test_symmetry_classify.py`
+
+---
+
+## Phase 4: Structure Completions — Dual & Validation
+
+### 4a. `structures/dual.py`
 Dual map construction: swap vertex and face roles.
 
 ```
@@ -420,7 +481,7 @@ dual_phi   = sigma      (vertex rotation becomes face walk)
 
 **Validation:** `dual_of(cube())` should have the topology of an octahedron (V=6, E=12, F=8). `dual_of(dual_of(dm))` should recover the original.
 
-### 2b. `structures/validation.py`
+### 4b. `structures/validation.py`
 Extract and expose the invariant checks already embedded in `DartMap.__post_init__`:
 
 - `check_alpha_involution(alpha)` — alpha[alpha[d]] == d, no fixed points
@@ -436,11 +497,11 @@ Extract and expose the invariant checks already embedded in `DartMap.__post_init
 
 ---
 
-## Phase 3: Triangulation
+## Phase 5: Triangulation
 
-**Why now:** Chrobak-Kant convex grid drawing (Phase 5) requires a **triangulated** 3-connected planar graph. Most Platonic solids are not triangulated (cube has quad faces, dodecahedron has pentagonal faces).
+**Why now:** Chrobak-Kant convex grid drawing (Phase 7: Canonical Ordering & Convex Grid Drawing) requires a **triangulated** 3-connected planar graph. Most Platonic solids are not triangulated (cube has quad faces, dodecahedron has pentagonal faces).
 
-### 3a. `algorithms/triangulation/augment.py`
+### 5a. `algorithms/triangulation/augment.py`
 - `triangulate(dm) -> DartMap`: Fan-triangulate every non-triangular face by adding edges from one vertex to all non-adjacent vertices on the face boundary
 - Track which edges/darts are "dummy" (added by triangulation) so they can be removed later — return a `TriangulationResult(dm, dummy_edges)` namedtuple
 
@@ -448,7 +509,7 @@ Extract and expose the invariant checks already embedded in `DartMap.__post_init
 
 **Implementation approach:** Rebuild face lists with subdivided faces, then call `DartMap.from_face_lists()`. This is simpler than in-place dart surgery and leverages the existing validated constructor.
 
-### 3b. `algorithms/triangulation/validation.py`
+### 5b. `algorithms/triangulation/validation.py`
 - `is_triangulated(dm) -> bool`: Check that every face orbit has exactly 3 darts
 
 ### Testing
@@ -464,15 +525,15 @@ Extract and expose the invariant checks already embedded in `DartMap.__post_init
 
 ---
 
-## Phase 4: Planar Embedding Infrastructure
+## Phase 6: Planar Embedding Infrastructure
 
-### 4a. `algorithms/planar/embedding.py`
+### 6a. `algorithms/planar/embedding.py`
 - `PlanarEmbeddingView(dm)`: Thin wrapper providing neighbor-order and face-boundary queries in terms the planar algorithms expect. Mostly delegates to traversal functions.
 - `ordered_neighbors(v)` → vertices adjacent to v in cyclic (sigma) order
 - `face_boundary_vertices(f)` → boundary vertices of face f
 - `degree(v)` → number of darts at vertex v
 
-### 4b. `algorithms/planar/outer_face.py`
+### 6b. `algorithms/planar/outer_face.py`
 - `choose_outer_face(dm) -> int`: Select the face to serve as the outer (unbounded) face for planar drawing. Heuristic: choose the face with the most boundary vertices.
 - `outer_face_anchors(dm, outer_face) -> tuple[int, int, int]`: Pick three vertices on the outer face boundary to anchor the convex drawing (needed by canonical ordering).
 
@@ -488,11 +549,11 @@ Extract and expose the invariant checks already embedded in `DartMap.__post_init
 
 ---
 
-## Phase 5: Canonical Ordering & Convex Grid Drawing
+## Phase 7: Canonical Ordering & Convex Grid Drawing
 
 This is the core near-term research target from the README.
 
-### 5a. `algorithms/planar/canonical_order.py`
+### 7a. `algorithms/planar/canonical_order.py`
 Canonical ordering of a **triangulated** 3-connected planar graph (de Fraysseix, Pach, Pollack / Kant).
 
 **Input:** Triangulated DartMap + outer face with 3 anchor vertices (v1, v2, vn)
@@ -505,16 +566,16 @@ Canonical ordering of a **triangulated** 3-connected planar graph (de Fraysseix,
 
 **Math:** Graph theory — contiguous neighbor intervals on a boundary path. Implementation uses the DartMap's face/vertex traversal to identify boundary structure.
 
-### 5b. `algorithms/planar/contour_state.py`
+### 7b. `algorithms/planar/contour_state.py`
 - Track the evolving outer contour during incremental vertex placement
 - Doubly-linked list of boundary vertices with efficient insert/delete
 - `ContourState`: init from base edge (v1, v2), then `add_vertex(vk, left, right)` to update boundary
 
-### 5c. `algorithms/planar/shift_structure.py`
+### 7c. `algorithms/planar/shift_structure.py`
 - Shift accumulator for Chrobak-Kant x-coordinate computation
 - Each vertex gets a relative x-shift; final coordinates computed by prefix sum
 
-### 5d. `geometry/planar/layout.py`
+### 7d. `geometry/planar/layout.py`
 - `chrobak_kant_layout(dm, outer_face=None) -> dict[int, tuple[int, int]]`
   - Full pipeline: triangulate → canonical order → shift-based placement
   - Returns integer grid coordinates for each vertex
@@ -542,16 +603,16 @@ Canonical ordering of a **triangulated** 3-connected planar graph (de Fraysseix,
 
 ---
 
-## Phase 6: Visualization (Planar)
+## Phase 8: Visualization (Planar)
 
-### 6a. `visualization/matplotlib_planar.py`
+### 8a. `visualization/matplotlib_planar.py`
 - `draw_planar_graph(dm, positions, ax=None)`: Draw edges as line segments, vertices as points
 - `draw_faces(dm, positions, ax=None, colors=None)`: Fill faces with color
 - Optional: label vertices, highlight orbits
 
 **Math:** None beyond coordinate indexing. Uses matplotlib patches/lines.
 
-### 6b. `visualization/svg_planar.py`
+### 8b. `visualization/svg_planar.py`
 - `render_svg(dm, positions) -> str`: Pure SVG string output (no matplotlib dependency)
 - Edges as `<line>`, vertices as `<circle>`, faces as `<polygon>`
 
@@ -598,105 +659,6 @@ Step-by-step animated/interactive visualization of the canonical ordering algori
 - `src/polygraph/visualization/walkthrough.py`
 - `tests/visualization/test_planar_viz.py`
 - `tests/visualization/test_walkthrough.py`
-
----
-
-## Phase 7: Symmetry Detection
-
-### 7a. `interop/bliss_adapter.py` (or pure-Python fallback)
-BLISS computes automorphism generators via canonical labeling. Two options:
-- **Option A:** Use `pynauty` or `sagemath` bindings if available
-- **Option B:** Pure-Python brute-force for small graphs (viable for polyhedra ≤ 120 darts)
-
-Start with Option B for research flexibility; add BLISS later.
-
-**Pure-Python approach:** Build a colored graph from the DartMap (vertex for each dart, edges for sigma/alpha), then find automorphisms via backtracking with pruning. For polyhedral graphs (≤ ~60 vertices), this is fast enough.
-
-### 7b. `algorithms/symmetry/automorphisms.py`
-- `compute_automorphism_generators(dm) -> list[Permutation]`: Return generating set for Aut(dm)
-- `automorphism_group_order(generators, num_darts) -> int`: Compute |Aut(dm)| via Schreier-Sims or orbit-counting
-- `is_orientation_preserving(pi, dm) -> bool`: Check if automorphism preserves face orientation
-
-### 7c. `algorithms/symmetry/orbits.py`
-- `compute_orbits(generators, n) -> list[list[int]]`: General orbit computation under a permutation group
-- `dart_orbits(generators, dm)`, `vertex_orbits(generators, dm)`, `edge_orbits(generators, dm)`, `face_orbits(generators, dm)`: Derived orbit partitions
-
-**Math:** Union-find on elements under generator action. For each generator g and element x, union x with g(x).
-
-### 7d. `algorithms/symmetry/wyckoff.py` — Wyckoff-style orbit labels
-
-**Minimum foundation:** Requires 7b–7c (automorphism generators + orbit partitions). No geometry needed — purely combinatorial.
-
-Wyckoff positions in crystallography label each distinct site orbit in a structure by a letter (`a`, `b`, `c`, …) ordered from highest-symmetry sites to lowest. The analogous concept for finite polyhedra labels each orbit of vertices, edges, and faces under the combinatorial automorphism group Aut(dm).
-
-**Why this is natural here:** once `vertex_orbits(generators, dm)` gives the partition into orbits, assigning letters and reporting the site-symmetry subgroup (stabiliser of a representative element) is straightforward.
-
-```python
-@dataclass
-class WyckoffSite:
-    label: str          # 'a', 'b', 'c', ... (restart separately per kind)
-    kind: str           # 'vertex' | 'edge' | 'face'
-    multiplicity: int   # number of elements in the orbit
-    stabilizer_order: int  # |Aut(dm)| / multiplicity
-
-def wyckoff_table(generators, dm) -> list[WyckoffSite]:
-    """Return Wyckoff-style orbit labels for vertices, edges, and faces.
-
-    The result is grouped by kind, and within each kind the orbits are
-    ordered by decreasing stabilizer order (highest symmetry first).
-    Labels restart from 'a' independently for vertices, edges, and faces,
-    so a highly symmetric solid typically has vertex 'a', edge 'a',
-    and face 'a' for its unique orbits of each kind.
-    """
-```
-
-The Schläfli-symbol and vertex-configuration functions from Phase 1d become fast consistency checks: a regular polyhedron `{p, q}` must have exactly one vertex orbit, one edge orbit, and one face orbit (all labelled `a`).
-
-**Example outputs:**
-
-| Solid | Vertex orbits | Edge orbits | Face orbits |
-|---|---|---|---|
-| Tetrahedron | a (×4) | a (×6) | a (×4) |
-| Cube | a (×8) | a (×12) | a (×6) |
-| Prism(5) | a (×5), b (×5) | a (×5), b (×10) | a (×2), b (×5) |
-
-**Files:**
-- `src/polygraph/algorithms/symmetry/wyckoff.py`
-- tests added to `tests/algorithms/test_symmetry.py`
-
-### Testing
-- Tetrahedron: |Aut| = 24, 1 vertex orbit, 1 edge orbit, 1 face orbit
-- Cube: |Aut| = 48, 1 vertex orbit, 1 edge orbit, 1 face orbit
-- Prism(5): |Aut| = 20, 2 vertex orbits, 2 edge orbits, 2 face orbits
-- Wyckoff table for cube: 3 rows (vertex-a, edge-a, face-a), each multiplicity matches V/E/F
-- Wyckoff table for Prism(5): 6 rows covering the two vertex orbits, two edge orbits, two face orbits
-
-### Files
-- `src/polygraph/interop/bliss_adapter.py` (or inline pure-Python)
-- `src/polygraph/algorithms/symmetry/automorphisms.py`
-- `src/polygraph/algorithms/symmetry/orbits.py`
-- `src/polygraph/algorithms/symmetry/wyckoff.py`
-- `tests/algorithms/test_symmetry.py`
-
----
-
-## Phase 8: Symmetry Classification & Point Groups
-
-### 8a. `algorithms/symmetry/point_groups.py`
-- Define point group templates as named tuples: `(name, order, generators_pattern)`
-- Families: C_n, D_n, T, O, I (and their variants with reflections)
-- `cyclic(n)`, `dihedral(n)`, `tetrahedral()`, `octahedral()`, `icosahedral()`
-
-### 8b. `algorithms/symmetry/classify.py`
-- `classify_symmetry(generators, dm) -> str`: Match computed automorphism group against known point group templates
-- Uses group order + orbit structure to narrow candidates
-
-**Math:** Group order determines the family. |Aut|=24 on a solid with 1 vertex orbit → tetrahedral. |Aut|=48 → octahedral. |Aut|=120 → icosahedral. |Aut|=2n with 2 vertex orbits → dihedral D_n.
-
-### Files
-- `src/polygraph/algorithms/symmetry/point_groups.py`
-- `src/polygraph/algorithms/symmetry/classify.py`
-- `tests/algorithms/test_symmetry_classify.py`
 
 ---
 
@@ -858,7 +820,7 @@ to chain calls by hand.
 
 ## Verification Strategy
 
-Each phase includes tests. The end-to-end pipeline test after Phase 6:
+Each phase includes tests. The end-to-end pipeline test after Phase 8:
 
 ```python
 from polygraph.generators.platonic import cube
