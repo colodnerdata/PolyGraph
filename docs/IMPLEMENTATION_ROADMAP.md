@@ -301,14 +301,20 @@ Wyckoff positions in crystallography label each distinct site orbit in a structu
 ```python
 @dataclass
 class WyckoffSite:
-    label: str          # 'a', 'b', 'c', ...
+    label: str          # 'a', 'b', 'c', ... (restart separately per kind)
     kind: str           # 'vertex' | 'edge' | 'face'
     multiplicity: int   # number of elements in the orbit
     stabilizer_order: int  # |Aut(dm)| / multiplicity
 
 def wyckoff_table(generators, dm) -> list[WyckoffSite]:
-    """Return orbit labels for vertices, edges, and faces, ordered by
-    decreasing stabilizer order (highest symmetry first → label 'a')."""
+    """Return Wyckoff-style orbit labels for vertices, edges, and faces.
+
+    The result is grouped by kind, and within each kind the orbits are
+    ordered by decreasing stabilizer order (highest symmetry first).
+    Labels restart from 'a' independently for vertices, edges, and faces,
+    so a highly symmetric solid typically has vertex 'a', edge 'a',
+    and face 'a' for its unique orbits of each kind.
+    """
 ```
 
 The Schläfli-symbol and vertex-configuration functions from Phase 1d become fast consistency checks: a regular polyhedron `{p, q}` must have exactly one vertex orbit, one edge orbit, and one face orbit (all labelled `a`).
