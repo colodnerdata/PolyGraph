@@ -435,7 +435,7 @@ positions = chrobak_kant_layout(tri_dm)
 draw_planar_graph(tri_dm, positions)
 
 # Educational walkthrough: split-screen peeling + buildup
-frames = build_walkthrough_frames(dm)
+frames = build_walkthrough_frames(tri_dm)
 render_walkthrough_matplotlib(frames, output_path="cube_walkthrough.gif")
 ```
 
