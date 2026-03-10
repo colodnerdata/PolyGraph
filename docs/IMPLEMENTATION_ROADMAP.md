@@ -372,8 +372,8 @@ Each operator takes a DartMap and produces a new DartMap.
   The stub `src/polygraph/interop/ogdf_adapter.py` is already present as a placeholder.
   The adapter converts a `DartMap` to an OGDF `Graph` + `GraphAttributes` object, delegates
   layout computation to OGDF, and maps 2D position results back to dart indices. This remains
-  optional (require-extra `ogdf`) so the core library has no C++ dependency; it is activated
-  only when `pyogdf` is importable.
+  an optional dependency so the core library has no C++ requirement; it is activated only when
+  `pyogdf` is importable and may be exposed via a dedicated extras entry in `pyproject.toml`.
   - `ogdf_to_dart_map(graph, graph_attrs) -> DartMap`: Import a laid-out OGDF graph
   - `dart_map_to_ogdf(dm) -> tuple[Graph, GraphAttributes]`: Export for OGDF layout
   - `apply_ogdf_layout(dm, algorithm="fmmm") -> dict[int, tuple[float, float]]`: Run a named
