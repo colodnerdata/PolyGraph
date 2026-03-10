@@ -144,15 +144,16 @@ class Permutation:
         -----
         This generator emits each orbit element exactly once in traversal order.
         """
-        n = len(self.mapping)
+        mapping = self.mapping
+        n = len(mapping)
         if not 0 <= start < n:
             raise IndexError(
-                f"Start index {start} out of range for permutation of size {n}."
+                f"Start index {start} out of range for permutation of size {n}"
             )
         i = start
         while True:
             yield i
-            i = self[i]
+            i = mapping[i]
             if i == start:
                 break
 
