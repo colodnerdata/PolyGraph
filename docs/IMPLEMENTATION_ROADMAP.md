@@ -461,11 +461,24 @@ Each operator takes a DartMap and produces a new DartMap.
 
 ### 12b. Interop
 - `interop/networkx_adapter.py`: Convert DartMap ↔ NetworkX graph (lose embedding info, keep adjacency)
+- `interop/ogdf_adapter.py`: Bridge to OGDF (Open Graph Drawing Framework) for advanced layout
+  algorithms not implemented natively (e.g., orthogonal, hierarchical, force-directed).
+  **Rationale:** OGDF is a mature C++ graph-drawing library with Python bindings (`pyogdf`).
+  The stub `src/polygraph/interop/ogdf_adapter.py` is already present as a placeholder.
+  The adapter converts a `DartMap` to an OGDF `Graph` + `GraphAttributes` object, delegates
+  layout computation to OGDF, and maps 2D position results back to dart indices. This remains
+  an optional dependency so the core library has no C++ requirement; it is activated only when
+  `pyogdf` is importable and may be exposed via a dedicated extras entry in `pyproject.toml`.
+  - `ogdf_to_dart_map(graph, graph_attrs) -> DartMap`: Import a laid-out OGDF graph
+  - `dart_map_to_ogdf(dm) -> tuple[Graph, GraphAttributes]`: Export for OGDF layout
+  - `apply_ogdf_layout(dm, algorithm="fmmm") -> dict[int, tuple[float, float]]`: Run a named
+    OGDF algorithm and return per-dart 2D positions
 - `structures/io.py`: Serialize/deserialize DartMap to JSON (face lists + vertex count)
 
 ### Files
 - `src/polygraph/export/*.py`
 - `src/polygraph/interop/networkx_adapter.py`
+- `src/polygraph/interop/ogdf_adapter.py`
 - `src/polygraph/structures/io.py`
 
 ---
