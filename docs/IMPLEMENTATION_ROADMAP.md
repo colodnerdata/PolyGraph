@@ -839,10 +839,15 @@ frames = build_walkthrough_frames(tri_dm)
 render_walkthrough_matplotlib(frames, output_path="cube_walkthrough.gif")
 ```
 
-After Phase 10:
+After Phase 13:
 ```python
+from polygraph.generators.platonic import cube
 from polygraph.geometry.polyhedral.optimizer import realize
-vertices_3d = realize(cube())
+from polygraph.visualization.matplotlib_3d import draw_polyhedron
+
+dm = cube()
+vertices_3d = realize(dm)
+draw_polyhedron(dm, vertices_3d)
 ```
 
 Run at each phase:
