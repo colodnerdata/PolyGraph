@@ -181,7 +181,7 @@ Canonical ordering of a **triangulated** 3-connected planar graph (de Fraysseix,
 
 **Math:** The Chrobak-Kant algorithm:
 1. Compute canonical ordering
-2. Place v1 at (0, 0), v2 at (2(n-1)-4, 0)
+2. Place v1 at (0, 0), v2 at (2(n-2), 0)
 3. For each vk in order: place on lines of slope +1 and -1 from its leftmost and rightmost existing neighbors
 4. Shift existing vertices to make room (shift structure)
 
