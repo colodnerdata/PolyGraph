@@ -843,11 +843,13 @@ After Phase 13:
 ```python
 from polygraph.generators.platonic import cube
 from polygraph.geometry.polyhedral.optimizer import realize
-from polygraph.visualization.matplotlib_3d import draw_polyhedron
+# Planned 3D visualization API (not implemented yet):
+# from polygraph.visualization.matplotlib_3d import draw_polyhedron
 
 dm = cube()
 vertices_3d = realize(dm)
-draw_polyhedron(dm, vertices_3d)
+# Once 3D visualization is implemented, you can render the result with:
+# draw_polyhedron(dm, vertices_3d)
 ```
 
 Run at each phase:
