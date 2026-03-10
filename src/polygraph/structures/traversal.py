@@ -98,10 +98,7 @@ def vertex_darts(dm: DartMap, d: int) -> Iterator[int]:
     IndexError
         If ``d`` is outside ``[0, dm.num_darts)``.
     """
-    if not 0 <= d < dm.num_darts:
-        raise IndexError(
-            f"Dart index {d} out of range [0, {dm.num_darts})."
-        )
+    dm.validate_dart(d)
     cur = d
     while True:
         yield cur
@@ -130,10 +127,7 @@ def face_darts(dm: DartMap, d: int) -> Iterator[int]:
     IndexError
         If ``d`` is outside ``[0, dm.num_darts)``.
     """
-    if not 0 <= d < dm.num_darts:
-        raise IndexError(
-            f"Dart index {d} out of range [0, {dm.num_darts})."
-        )
+    dm.validate_dart(d)
     # Build the face permutation once, then traverse it without repeated
     # DartMap.phi() calls (which perform bounds checks on every step).
     phi_perm = _phi_permutation(dm)
@@ -160,10 +154,7 @@ def edge_darts(dm: DartMap, d: int) -> Iterator[int]:
     IndexError
         If ``d`` is outside ``[0, dm.num_darts)``.
     """
-    if not 0 <= d < dm.num_darts:
-        raise IndexError(
-            f"Dart index {d} out of range [0, {dm.num_darts})."
-        )
+    dm.validate_dart(d)
     yield d
     yield dm.alpha[d]
 
