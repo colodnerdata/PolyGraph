@@ -495,7 +495,7 @@ Extract and expose the invariant checks already embedded in `DartMap.__post_init
 
 ### 5a. `algorithms/triangulation/augment.py`
 - `triangulate(dm) -> TriangulationResult`: Fan-triangulate every non-triangular face by adding edges from one vertex to all non-adjacent vertices on the face boundary
-- Track which edges/darts are "dummy" (added by triangulation) so they can be removed later — return a `TriangulationResult(dart_map, dummy_edges)` namedtuple
+- Track which edges are "dummy" (added by triangulation) by recording their **representative darts** (one dart per undirected edge, per the representative-dart convention), so they can be removed later — return a `TriangulationResult(dart_map, dummy_edges)` namedtuple, where `dummy_edges` is this collection of representative darts
 
 **Math:** For a face with k vertices (k > 3), pick one vertex v and add edges to the k-3 non-adjacent vertices. This adds k-3 edges and splits the face into k-2 triangles. New darts need correct sigma/alpha wiring.
 
