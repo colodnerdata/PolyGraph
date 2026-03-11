@@ -163,7 +163,7 @@ Every nontrivial contribution should include tests.
 
 Tests should focus first on correctness and invariants, not incidental implementation details.
 
-Prefer small, explicit fixtures. Polyhedral generators like tetrahedron, cube, prism, and antiprism should be used heavily as canonical test cases.
+Prefer small, explicit fixtures. As polyhedral generators (for shapes such as tetrahedron, cube, prism, and antiprism) are implemented, they can serve as canonical test cases.
 
 For mathematical code, test invariants directly. Examples include:
 
