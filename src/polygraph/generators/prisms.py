@@ -29,6 +29,18 @@ def prism(n: int) -> DartMap:
     ------
     ValueError
         If ``n < 3``.
+
+    Notes
+    -----
+    The top cap traverses each top edge as ``top[i] -> top[i + 1]``, and the
+    corresponding side quad traverses the same undirected edge in reverse as
+    ``top[i + 1] -> top[i]``. The bottom cap is reversed for the same reason.
+
+    Each vertical edge appears in two adjacent side quads, once as
+    ``top[i] -> bottom[i]`` and once as ``bottom[i] -> top[i]``. Each bottom
+    edge appears once in a side quad and once in the reversed bottom cap with
+    opposite directions, so every undirected edge appears exactly twice with
+    opposite winding across adjacent faces.
     """
     if n < 3:
         raise ValueError("prism(n) requires n >= 3")
@@ -36,18 +48,10 @@ def prism(n: int) -> DartMap:
     top = list(range(0, 2 * n, 2))
     bottom = list(range(1, 2 * n, 2))
     faces = [top, bottom[::-1]]
-    # The top cap contributes each top edge as top[i] -> top[i + 1], while the
-    # side quad uses the same undirected edge in reverse as
-    # top[i + 1] -> top[i]. The bottom cap is reversed for the same reason, so
-    # every cap edge appears exactly twice with opposite directions.
     faces += [
         [top[i], bottom[i], bottom[(i + 1) % n], top[(i + 1) % n]]
         for i in range(n)
     ]
-    # Each vertical edge appears in two adjacent side quads:
-    # top[i] -> bottom[i] in quad i and bottom[i] -> top[i] in quad i - 1.
-    # Each bottom edge appears as bottom[i] -> bottom[i + 1] here and
-    # bottom[i + 1] -> bottom[i] in the reversed bottom cap.
     return DartMap.from_face_lists(faces, num_vertices=2 * n)
 
 
@@ -68,6 +72,19 @@ def antiprism(n: int) -> DartMap:
     ------
     ValueError
         If ``n < 3``.
+
+    Notes
+    -----
+    The first triangle family traverses each top edge as
+    ``top[i + 1] -> top[i]``, opposite the top-cap direction
+    ``top[i] -> top[i + 1]``. Its slanted edges are paired by adjacent
+    triangles in the second family.
+
+    The second triangle family completes the band so that
+    ``top[i + 1] -> bottom[i]`` reverses ``bottom[i] -> top[i + 1]`` from the
+    first family, while ``bottom[i] -> bottom[i + 1]`` reverses the direction
+    used in the reversed bottom cap. Every undirected edge therefore appears
+    exactly twice, once per adjacent face, with opposite winding.
     """
     if n < 3:
         raise ValueError("antiprism(n) requires n >= 3")
@@ -75,19 +92,10 @@ def antiprism(n: int) -> DartMap:
     top = list(range(0, 2 * n, 2))
     bottom = list(range(1, 2 * n, 2))
     faces = [top, bottom[::-1]]
-    # The first triangle family uses each top edge as
-    # top[i + 1] -> top[i], opposite the top-cap direction
-    # top[i] -> top[i + 1]. Its slanted edges are then paired by the adjacent
-    # triangles in the second family.
     faces += [
         [top[i], bottom[i], top[(i + 1) % n]]
         for i in range(n)
     ]
-    # The second triangle family completes the band so that
-    # top[i + 1] -> bottom[i] reverses bottom[i] -> top[i + 1] from the first
-    # family, and bottom[i] -> bottom[i + 1] reverses the direction used in the
-    # reversed bottom cap. This makes every undirected edge appear exactly
-    # twice, once per adjacent face, with opposite winding.
     faces += [
         [top[(i + 1) % n], bottom[i], bottom[(i + 1) % n]]
         for i in range(n)
