@@ -1,4 +1,4 @@
-Contributing Style Guide
+# Contributing
 
 PolyGraph is a research-oriented Python library for combinatorial topology, planar graph drawing, and polyhedral realization. Contributions should favor clarity, mathematical correctness, and maintainability over cleverness.
 
