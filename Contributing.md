@@ -101,6 +101,7 @@ Put mathematical explanation in Notes, not in the summary line.
 
 Example docstring template
 
+```python
 def orbit(self, start: int) -> Iterator[int]:
     """Iterate over the orbit of an index under the permutation.
 
@@ -124,6 +125,7 @@ def orbit(self, start: int) -> Iterator[int]:
     The orbit is defined by repeated application of the permutation until
     the starting index repeats.
     """
+```
 
 Module docstrings
 
