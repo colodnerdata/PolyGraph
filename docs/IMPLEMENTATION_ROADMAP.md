@@ -491,9 +491,11 @@ Extract and expose the invariant checks already embedded in `DartMap.__post_init
 
 **Why now:** Chrobak-Kant convex grid drawing (Phase 8: Canonical Ordering & Convex Grid Drawing) requires a **triangulated** 3-connected planar graph. Most Platonic solids are not triangulated (cube has quad faces, dodecahedron has pentagonal faces).
 
+**Placement note:** Phase 5 is intentionally ordered after Phases 2–3 (symmetry detection and classification). The choice of diagonals when splitting non-triangular faces should preserve as much of the original symmetry as possible, rather than breaking it arbitrarily. The exact mechanism for symmetry-preserving triangulation is still to be worked out. A candidate approach: for each orbit of n-gons (n > 3), examine the vertex orbits along the face boundary; if the boundary vertices fall into two or more distinct vertex orbits, prefer diagonals that connect representatives of distinct orbits. Uniform faces (all vertices in one orbit) may require a tie-breaking rule based on dart index or symmetry-group order.
+
 ### 5a. `algorithms/triangulation/augment.py`
-- `triangulate(dm) -> DartMap`: Fan-triangulate every non-triangular face by adding edges from one vertex to all non-adjacent vertices on the face boundary
-- Track which edges/darts are "dummy" (added by triangulation) so they can be removed later — return a `TriangulationResult(DartMap, dummy_edges)` namedtuple
+- `triangulate(dm) -> TriangulationResult`: Fan-triangulate every non-triangular face by adding edges from one vertex to all non-adjacent vertices on the face boundary
+- Track which edges are "dummy" (added by triangulation) by recording their **representative darts** (one dart per undirected edge, per the representative-dart convention), so they can be removed later — return a `TriangulationResult(dart_map, dummy_edges)` namedtuple, where `dummy_edges` is this collection of representative darts
 
 **Math:** For a face with k vertices (k > 3), pick one vertex v and add edges to the k-3 non-adjacent vertices. This adds k-3 edges and splits the face into k-2 triangles. New darts need correct sigma/alpha wiring.
 
