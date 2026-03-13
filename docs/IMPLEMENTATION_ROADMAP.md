@@ -10,6 +10,42 @@ PolyGraph is a research library for polyhedral topology built on combinatorial m
 - Each phase should produce testable, usable artifacts (not just plumbing)
 - Numpy for array math; avoid custom linear algebra wrappers
 
+### Geometry Pipeline
+
+The system is designed to separate topology from geometry and to treat
+floating-point as the working representation. In later phases (see Phase 13),
+an exact geometry backend (CGAL) is planned as an escape hatch when numeric
+methods become unreliable:
+
+```
+Topology (DartMap)
+     │
+     ▼
+Numeric Geometry (float64 optimization)
+     │
+     ▼
+Validation & Diagnostics
+     │
+     ├── pass ──────────────► Visualization / Export
+     │
+     └── instability ──► Exact Geometry (CGAL)
+                              │
+                              ▼
+                         Stable float64 coords
+                              │
+                              ▼
+                         Visualization / Export
+```
+
+The pipeline is intended to stay fast by remaining numeric most of the time.
+Exact arithmetic will be invoked only when validation detects degeneracies,
+constraint violations, or numerical instability. The minimal CGAL integration
+planned for this phase consists of: the exact kernel (EPECK), `Plane_3`, a
+mesh structure (`Surface_mesh` or `Polyhedron_3`), and optionally convex hull
+/ halfspace intersection algorithms. This combination will verify planes,
+reconstruct exact vertices when numeric methods fail, and convert the result
+back to float64 for rendering.
+
 ---
 
 ## Phase 1: Generators — Platonic Solids & Parametric Families
@@ -746,7 +782,11 @@ to chain calls by hand.
 
 ---
 
-## Phase 11: Polyhedral Realization (3D Geometry)
+## Phase 11: Polyhedral Realization (Numeric, float64)
+
+This phase produces a numeric geometric realization using optimization and
+floating-point arithmetic. The output is a candidate realization that must
+pass through validation (Phase 12) before it is considered trustworthy.
 
 ### 11a. `geometry/polyhedral/face_planes.py`
 - `FacePlaneParams`: Parameterize each face by a normal direction (2 spherical angles) + offset
@@ -763,12 +803,13 @@ to chain calls by hand.
 - Or: random initialization with constraints (all normals pointing outward)
 
 ### 11d. `geometry/polyhedral/optimizer.py`
-- `realize(dm, symmetry=None) -> ndarray`: Find 3D vertex positions satisfying:
+- `realize(dm, symmetry=None) -> RealizationResult`: Find 3D vertex positions satisfying:
   - Faces are planar
   - Edges have roughly uniform length (edge_uniformity_energy)
   - Dihedral angles are positive / faces don't intersect (dihedral_margin_energy)
   - Optional: symmetry constraints (reduce parameter space)
 - Uses `scipy.optimize.minimize` with gradient-free or L-BFGS
+- Returns `RealizationResult(vertices, face_planes, residuals)` — not yet validated
 
 **Math:** Energy minimization. Parameters: face plane angles + offsets. Objective: sum of edge-length variance + dihedral penalty. Vertex positions are derived quantities (from vertex_recovery).
 
@@ -781,14 +822,154 @@ to chain calls by hand.
 
 ---
 
-## Phase 12: Layout Refinement & Advanced Drawing
+## Phase 12: Geometric Validation & Diagnostics
 
-### 12a. `geometry/planar/refinement.py`
+The validation layer sits between numeric realization and visualization.
+It decides whether a numeric result is trustworthy or needs exact geometry
+escalation. All checks use pure numpy — no CGAL dependency.
+
+### 12a. `geometry/validation/diagnostics.py`
+Per-element diagnostic checks on a `RealizationResult`:
+
+- `face_planarity_residuals(vertices, dm) -> ndarray`: For each face, fit a plane to its vertices and return max deviation. Faces with k > 3 vertices can fail to be planar under float64 optimization.
+- `edge_length_variance(vertices, dm) -> float`: Coefficient of variation of edge lengths — flags degenerate near-zero-length edges.
+- `dihedral_angles(vertices, normals, dm) -> ndarray`: Dihedral angle at each edge. Negative or near-zero angles indicate face-face intersection or near-degeneracy.
+- `vertex_degeneracy(vertices, dm) -> ndarray`: For each vertex, condition number of the plane intersection system. High condition number → vertex position is numerically unstable.
+
+### 12b. `geometry/validation/stability.py`
+Aggregate stability assessment:
+
+- `ValidationReport`: Dataclass collecting all diagnostics with pass/fail per check.
+- `validate_realization(result, dm, tolerances=None) -> ValidationReport`:
+  Runs all diagnostics and classifies the result:
+  - `STABLE` — all checks pass within tolerances, proceed to rendering
+  - `MARGINAL` — some metrics near threshold, flag for user review
+  - `UNSTABLE` — one or more checks fail, recommend exact geometry escalation
+- `default_tolerances() -> dict`: Sensible defaults (e.g., planarity residual < 1e-10, condition number < 1e8, min dihedral angle > 1e-6 rad)
+
+**Math:** Condition number of the 3×k plane-intersection system at each vertex (from `numpy.linalg.cond`). Planarity residual is the max distance from a vertex to the best-fit plane through its face's vertices. These are standard numerical stability metrics — no new theory needed.
+
+**Design note:** Tolerances are configurable because research use cases may want to experiment with different thresholds. The defaults should be conservative enough to catch genuine problems without false-flagging well-conditioned results.
+
+### Testing
+- Known-good Platonic solids (from exact coordinates) should validate as STABLE
+- Deliberately perturbed inputs (e.g., near-degenerate dihedral angles) should validate as UNSTABLE
+- Condition number check should flag nearly-coplanar face triples at a vertex
+
+### Files
+- `src/polygraph/geometry/validation/__init__.py`
+- `src/polygraph/geometry/validation/diagnostics.py`
+- `src/polygraph/geometry/validation/stability.py`
+- `tests/geometry/test_validation.py`
+
+---
+
+## Phase 13: Exact Geometry Fallback (CGAL)
+
+When validation (Phase 12) reports `UNSTABLE`, this layer provides an exact
+arithmetic reconstruction using CGAL. The pipeline escalates to exact
+computation, reconstructs or verifies the geometry, then converts back to
+stable float64 coordinates for downstream use.
+
+### 13a. `interop/cgal_adapter.py`
+Thin wrapper isolating all CGAL-specific types behind a Python interface.
+Uses `CGAL` Python bindings (via `cgal-bindings` / scikit-geometry /
+`CGAL.CGAL_Kernel`).
+
+**Minimal CGAL surface:**
+
+| CGAL type | Purpose | Python wrapper |
+|---|---|---|
+| `Exact_predicates_exact_constructions_kernel` (EPECK) | Exact arithmetic kernel | Selected at import time |
+| `Plane_3` | Exact plane representation (a, b, c, d) | `ExactPlane(a, b, c, d)` |
+| `Point_3` | Exact 3D point | `ExactPoint(x, y, z)` |
+| `Surface_mesh` | Halfedge mesh structure | `ExactMesh` |
+
+**Key adapter functions:**
+- `planes_from_numpy(normals, offsets) -> list[Plane_3]`: Convert float64 face planes to exact CGAL planes (rational approximation via `Fraction` or CGAL's built-in float-to-exact conversion)
+- `points_to_numpy(exact_points) -> ndarray`: Convert exact points back to float64
+- `surface_mesh_from_dart_map(dm, vertices) -> Surface_mesh`: Build CGAL mesh from DartMap + vertex positions
+- `is_available() -> bool`: Runtime check for CGAL bindings (the rest of the library works without CGAL installed)
+
+**Design note:** All CGAL imports are lazy. If CGAL is not installed, the adapter raises `ImportError` with a clear message. The rest of PolyGraph never imports CGAL directly — only through this adapter.
+
+### 13b. `geometry/exact/reconstruction.py`
+Exact vertex reconstruction from face planes:
+
+- `reconstruct_vertices_exact(normals, offsets, dm) -> ndarray`: For each vertex, intersect its incident face planes using exact CGAL arithmetic, then convert the result back to float64. This is the exact equivalent of `vertex_recovery.recover_vertices()`.
+- `verify_planes_exact(normals, offsets, dm) -> list[bool]`: For each face, check whether its vertices are exactly coplanar under the given planes. Returns per-face pass/fail.
+
+**Math:** Plane intersection in exact arithmetic. Three planes n_i · x = d_i define a unique point (if non-degenerate) via Cramer's rule over exact rationals. CGAL's EPECK kernel handles this without floating-point error. For vertices incident to > 3 faces, verify consistency by checking that the intersection point of any 3 incident planes satisfies the remaining plane equations exactly.
+
+### 13c. `geometry/exact/verification.py`
+Higher-level verification using exact CGAL operations:
+
+- `verify_polyhedron_exact(dm, vertices, normals, offsets) -> ExactVerificationReport`: Build an exact `Surface_mesh`, verify:
+  - All faces are exactly planar
+  - All edges have positive length
+  - All dihedral angles are positive (no face-face intersections)
+  - The mesh is a valid closed 2-manifold
+- `convex_hull_check(vertices) -> bool`: Verify that the vertex set matches its convex hull (for convex polyhedra)
+
+**Optional CGAL algorithms:**
+- `halfspace_intersection(planes) -> Surface_mesh`: Compute the polyhedron as an intersection of halfspaces — an alternative construction method that bypasses vertex recovery entirely
+- `convex_hull_3(points) -> Surface_mesh`: Exact convex hull for convex polyhedra
+
+### 13d. `geometry/exact/conversion.py`
+Controlled conversion from exact to numeric:
+
+- `exact_to_float64(exact_points) -> ndarray`: Direct conversion (may lose precision)
+- `exact_to_float64_stable(exact_points, reference_frame=None) -> ndarray`: Convert with optional recentering to minimize float64 representation error (translate centroid to origin before converting)
+
+### Integration with the pipeline
+
+The `realize()` function in `geometry/polyhedral/optimizer.py` gains an
+optional `validate=True` parameter. When enabled, the full pipeline is:
+
+*API sketch — not yet implemented (planned for Phases 11–13):*
+
+```python
+from dataclasses import replace
+
+dm = ...  # some DartMap
+result = realize(dm)                              # Phase 11: numeric
+report = validate_realization(result, dm)         # Phase 12: diagnostics
+if report.status == "UNSTABLE":
+    vertices = reconstruct_vertices_exact(         # Phase 13: exact
+        result.face_planes.normals,
+        result.face_planes.offsets,
+        dm,
+    )
+    result = replace(result, vertices=vertices)
+# proceed to visualization / export
+```
+
+### Testing
+- Reconstruct Platonic solid vertices from known exact face planes — compare against analytic coordinates
+- Deliberately ill-conditioned case (e.g., very flat dihedral angle) — verify exact reconstruction recovers correct geometry where float64 fails
+- Round-trip: float64 planes → exact reconstruction → float64 vertices should match direct float64 solve for well-conditioned cases (within tolerance)
+- `is_available()` returns False gracefully when CGAL not installed
+- All tests skip cleanly (`pytest.importorskip`) when CGAL bindings are absent
+
+### Files
+- `src/polygraph/interop/cgal_adapter.py`
+- `src/polygraph/geometry/exact/__init__.py`
+- `src/polygraph/geometry/exact/reconstruction.py`
+- `src/polygraph/geometry/exact/verification.py`
+- `src/polygraph/geometry/exact/conversion.py`
+- `tests/geometry/test_exact.py`
+- `tests/interop/test_cgal_adapter.py`
+
+---
+
+## Phase 14: Layout Refinement & Advanced Drawing
+
+### 14a. `geometry/planar/refinement.py`
 - `refine_planar_layout(positions, dm, generators=None) -> ndarray`: Post-process grid drawing with force-directed smoothing
 - `symmetry_energy(positions, generators)`: Penalize asymmetry
 - `angular_resolution_energy(positions, dm)`: Maximize minimum angle at vertices
 
-### 12b. `geometry/planar/layout.py` additions
+### 14b. `geometry/planar/layout.py` additions
 - `disk_link_layout(dm)`: Bekos et al. algorithm (constant edge-vertex resolution)
 
 ### Files
@@ -798,15 +979,15 @@ to chain calls by hand.
 
 ---
 
-## Phase 13: Export & Interop
+## Phase 15: Export & Interop
 
-### 13a. Export formats
+### 15a. Export formats
 - `export/obj.py`: Wavefront OBJ for 3D meshes (vertices + face indices)
 - `export/mesh_json.py`: JSON with vertices, faces, edges for web viewers
 - `export/planar_json.py`: JSON with 2D positions + graph structure
 - `export/svg.py`: Standalone SVG export
 
-### 13b. Interop
+### 15b. Interop
 - `interop/ogdf_adapter.py`: Bridge to OGDF (Open Graph Drawing Framework) for advanced layout
   algorithms not implemented natively (e.g., orthogonal, hierarchical, force-directed).
   **Rationale:** OGDF is a mature C++ graph-drawing library with Python bindings (`pyogdf`).
@@ -828,7 +1009,7 @@ to chain calls by hand.
 
 ---
 
-## Phase 14: 3D Visualization
+## Phase 16: 3D Visualization
 
 - `visualization/mesh_threejs.py`: Export three.js BufferGeometry JSON for web rendering
 - Optional: `visualization/matplotlib_3d.py` for quick 3D plots via mpl_toolkits.mplot3d
@@ -838,6 +1019,8 @@ to chain calls by hand.
 ## Verification Strategy
 
 Each phase includes tests. The end-to-end pipeline test after Phase 9:
+
+*API sketch — not yet implemented (planned for Phase 9):*
 
 ```python
 from polygraph.generators.platonic import cube
@@ -856,17 +1039,52 @@ frames = build_walkthrough_frames(tri_dm)
 render_walkthrough_matplotlib(frames, output_path="cube_walkthrough.gif")
 ```
 
-After Phase 13:
-```python
-from polygraph.generators.platonic import cube
-from polygraph.geometry.polyhedral.optimizer import realize
-# Planned 3D visualization API (not implemented yet):
-# from polygraph.visualization.matplotlib_3d import draw_polyhedron
+After Phase 11 (numeric realization):
 
-dm = cube()
-vertices_3d = realize(dm)
-# Once 3D visualization is implemented, you can render the result with:
-# draw_polyhedron(dm, vertices_3d)
+*API sketch — not yet implemented (planned for Phase 11):*
+
+```python
+from polygraph.geometry.polyhedral.optimizer import realize
+
+dm = ...  # some DartMap
+result = realize(dm)
+```
+
+After Phase 12 (validated pipeline):
+
+*API sketch — not yet implemented (planned for Phase 12):*
+
+```python
+from polygraph.geometry.polyhedral.optimizer import realize
+from polygraph.geometry.validation.stability import validate_realization
+
+dm = ...  # some DartMap
+result = realize(dm)
+report = validate_realization(result, dm)
+assert report.status == "STABLE"
+```
+
+After Phase 13 (with exact fallback):
+
+*API sketch — not yet implemented (planned for Phase 13):*
+
+```python
+from dataclasses import replace
+from polygraph.geometry.polyhedral.optimizer import realize
+from polygraph.geometry.validation.stability import validate_realization
+from polygraph.geometry.exact.reconstruction import reconstruct_vertices_exact
+
+dm = ...  # some DartMap
+result = realize(dm)
+report = validate_realization(result, dm)
+if report.status == "UNSTABLE":
+    vertices = reconstruct_vertices_exact(
+        result.face_planes.normals,
+        result.face_planes.offsets,
+        dm,
+    )
+    result = replace(result, vertices=vertices)
+# proceed to visualization / export
 ```
 
 Run at each phase:

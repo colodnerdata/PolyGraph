@@ -29,19 +29,36 @@ python -m build
 
 ## Architecture
 
-PolyGraph is a research library for polyhedral topology built on **combinatorial maps** (dart maps). It enforces strict separation of concerns across four layers:
+PolyGraph is a research library for polyhedral topology built on **combinatorial maps** (dart maps). It enforces strict separation of concerns across layers:
 
 ```
 Visualization  (matplotlib, SVG, three.js)
      ↑
-Geometry       (planar layout, 3D polyhedral realization)
+Export         (OBJ, JSON, SVG)
      ↑
+Geometry       (planar layout, 3D polyhedral realization)
+     │
+     ├── Validation & Diagnostics  (numeric stability checks)
+     │        │
+     │        └── Exact Geometry   (CGAL fallback when unstable)
+     │                │
+     │                └── ► stable float64 coords ─┐
+     │                                             │
+     ↑─────────────────────────────────────────────┘
 Algorithms     (symmetry, planar embedding, triangulation)
      ↑
 Structures     (DartMap, Permutation, Traversal)  ← current focus
      ↑
 Generators     (Platonic solids, prisms, Conway operators)
 ```
+
+The geometry pipeline is **planned** to stay numeric (float64) by default.
+In the roadmap design, when validation detects instability, it will escalate
+to exact arithmetic via CGAL (EPECK kernel, Plane_3, Surface_mesh),
+reconstruct the geometry exactly, and convert back to stable float64 for
+rendering and export. This validation→CGAL exact fallback is not yet
+implemented; the `geometry/validation` and `geometry/exact` modules are
+currently stubs.
 
 ### Core Topology Model (`src/polygraph/structures/`)
 
