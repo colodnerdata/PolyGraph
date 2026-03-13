@@ -29,19 +29,31 @@ python -m build
 
 ## Architecture
 
-PolyGraph is a research library for polyhedral topology built on **combinatorial maps** (dart maps). It enforces strict separation of concerns across four layers:
+PolyGraph is a research library for polyhedral topology built on **combinatorial maps** (dart maps). It enforces strict separation of concerns across layers:
 
+```mermaid
+flowchart TD
+    Gen["Generators\n(Platonic solids, prisms, Conway operators)"]
+    Struct["Structures\n(DartMap, Permutation, Traversal) ← current focus"]
+    Algo["Algorithms\n(symmetry, planar embedding, triangulation)"]
+    Geo["Geometry\n(planar layout, 3D polyhedral realization)"]
+    Val["Validation & Diagnostics\n(numeric stability checks)"]
+    Exact["Exact Geometry\n(CGAL fallback when unstable)"]
+    Export["Export\n(OBJ, JSON, SVG)"]
+    Viz["Visualization\n(matplotlib, SVG, three.js)"]
+
+    Gen --> Struct --> Algo --> Geo --> Export --> Viz
+    Geo --> Val --> Exact
+    Exact -->|"stable float64 coords"| Geo
 ```
-Visualization  (matplotlib, SVG, three.js)
-     ↑
-Geometry       (planar layout, 3D polyhedral realization)
-     ↑
-Algorithms     (symmetry, planar embedding, triangulation)
-     ↑
-Structures     (DartMap, Permutation, Traversal)  ← current focus
-     ↑
-Generators     (Platonic solids, prisms, Conway operators)
-```
+
+The geometry pipeline is **planned** to stay numeric (float64) by default.
+In the roadmap design, when validation detects instability, it will escalate
+to exact arithmetic via CGAL (EPECK kernel, Plane_3, Surface_mesh),
+reconstruct the geometry exactly, and convert back to stable float64 for
+rendering and export. This validation→CGAL exact fallback is not yet
+implemented; the `geometry/validation` and `geometry/exact` modules are
+currently stubs.
 
 ### Core Topology Model (`src/polygraph/structures/`)
 
