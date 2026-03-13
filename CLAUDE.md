@@ -52,10 +52,13 @@ Structures     (DartMap, Permutation, Traversal)  ← current focus
 Generators     (Platonic solids, prisms, Conway operators)
 ```
 
-The geometry pipeline stays numeric (float64) by default. When validation
-detects instability, it escalates to exact arithmetic via CGAL (EPECK kernel,
-Plane_3, Surface_mesh), reconstructs the geometry exactly, and converts back
-to stable float64 for rendering and export.
+The geometry pipeline is **planned** to stay numeric (float64) by default.
+In the roadmap design, when validation detects instability, it will escalate
+to exact arithmetic via CGAL (EPECK kernel, Plane_3, Surface_mesh),
+reconstruct the geometry exactly, and convert back to stable float64 for
+rendering and export. This validation→CGAL exact fallback is not yet
+implemented; the `geometry/validation` and `geometry/exact` modules are
+currently stubs.
 
 ### Core Topology Model (`src/polygraph/structures/`)
 
