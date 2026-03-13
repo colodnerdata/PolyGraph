@@ -40,7 +40,7 @@ Validation & Diagnostics
 The pipeline is intended to stay fast by remaining numeric most of the time.
 Exact arithmetic will be invoked only when validation detects degeneracies,
 constraint violations, or numerical instability. The minimal CGAL integration
-planned for this phase consists of: the exact kernel (EPECK), `Plane_3`, a
+planned for Phase 13 consists of: the exact kernel (EPECK), `Plane_3`, a
 mesh structure (`Surface_mesh` or `Polyhedron_3`), and optionally convex hull
 / halfspace intersection algorithms. This combination will verify planes,
 reconstruct exact vertices when numeric methods fail, and convert the result
