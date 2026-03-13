@@ -927,6 +927,8 @@ The `realize()` function in `geometry/polyhedral/optimizer.py` gains an
 optional `validate=True` parameter. When enabled, the full pipeline is:
 
 ```python
+from dataclasses import replace
+
 result = realize(dm)                              # Phase 11: numeric
 report = validate_realization(result, dm)         # Phase 12: diagnostics
 if report.status == "UNSTABLE":
@@ -935,7 +937,7 @@ if report.status == "UNSTABLE":
         result.face_planes.offsets,
         dm,
     )
-    result = result._replace(vertices=vertices)
+    result = replace(result, vertices=vertices)
 # proceed to visualization / export
 ```
 
