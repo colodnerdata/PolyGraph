@@ -130,7 +130,9 @@ def test_skeleton_traversal_methods_align_with_rep_dart_model() -> None:
     f_rep = next(all_face_orbits(dm))
 
     assert list(vertices_of_face(dm, f_rep)) == list(face_darts(dm, f_rep))
-    assert list(faces_incident_to_vertex(dm, v_rep)) == list(vertex_darts(dm, v_rep))
+    assert list(faces_incident_to_vertex(dm, v_rep)) == list(
+        vertex_darts(dm, v_rep)
+    )
 
     pairs = list(adjacent_face_pairs(dm))
     assert len(pairs) == dm.num_edges

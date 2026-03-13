@@ -1,15 +1,17 @@
 """Core combinatorial map structure based on darts and permutations.
 
-A DartMap encodes the topology of a graph embedding through three fundamental permutations on
-the set of darts:
+A DartMap encodes the topology of a graph embedding through three fundamental
+permutations on the set of darts:
 sigma — cyclic order of darts around each vertex
 alpha — pairing of opposite darts along each edge (an involution)
 phi(d) = sigma^{-1}(alpha(d)) — traversal of darts around faces
 This representation cleanly separates combinatorial topology from geometry. 
-The module provides utilities to construct maps, iterate vertex/edge/face orbits, and compute 
-topological invariants such as the Euler characteristic and genus.
-The structure is designed to support planar graph algorithms, symmetry analysis, and polyhedral
-realizations while remaining independent of any coordinate system.
+The module provides utilities to construct maps, iterate vertex/edge/face
+orbits, and compute topological invariants such as the Euler characteristic
+and genus.
+The structure is designed to support planar graph algorithms, symmetry
+analysis, and polyhedral realizations while remaining independent of any
+coordinate system.
 """
 
 from __future__ import annotations
@@ -41,9 +43,13 @@ def _inverse_permutation(perm: Sequence[int]) -> list[int]:
     inv = [-1] * n
     for i, j in enumerate(perm):
         if not 0 <= j < n:
-            raise ValueError(f"Permutation target out of range at index {i}: {j}.")
+            raise ValueError(
+                f"Permutation target out of range at index {i}: {j}."
+            )
         if inv[j] != -1:
-            raise ValueError(f"Permutation is not bijective; duplicate target {j}.")
+            raise ValueError(
+                f"Permutation is not bijective; duplicate target {j}."
+            )
         inv[j] = i
     return inv
 
@@ -101,7 +107,9 @@ class DartMap:
     _sigma_inv: list[int] = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
-        """Validate and normalize permutation data after dataclass initialization.
+        """Validate and normalize permutation data.
+        
+        Runs after dataclass initialization.
 
         Raises
         ------
@@ -125,11 +133,15 @@ class DartMap:
         _inverse_permutation(self.alpha)
 
         if n % 2 != 0:
-            raise ValueError("Number of darts must be even for a fixed-point-free alpha.")
+            raise ValueError(
+                "Number of darts must be even for a fixed-point-free alpha."
+            )
 
         for d, twin in enumerate(self.alpha):
             if twin == d:
-                raise ValueError(f"alpha must be fixed-point-free; alpha({d}) == {d}.")
+                raise ValueError(
+                    f"alpha must be fixed-point-free; alpha({d}) == {d}."
+                )
             if self.alpha[twin] != d:
                 raise ValueError(
                     f"alpha must be an involution; alpha(alpha({d})) = "
@@ -314,12 +326,15 @@ class DartMap:
         numerator = 2 * components - chi
         if numerator % 2 != 0:
             raise ValueError(
-                "Genus is not integral; map may not represent an orientable closed surface."
+                "Genus is not integral; map may not represent an orientable "
+                "closed surface."
             )
         return numerator // 2
 
     @classmethod
-    def from_face_lists(cls, faces: Sequence[Sequence[int]], num_vertices: int) -> DartMap:
+    def from_face_lists(
+        cls, faces: Sequence[Sequence[int]], num_vertices: int
+    ) -> DartMap:
         """Construct a map from oriented face vertex cycles.
 
         Parameters
@@ -377,14 +392,15 @@ def dart_map_from_face_lists(
         face_vertices = list(face)
         if len(face_vertices) < 3:
             raise ValueError(
-                f"Face {face_index} has {len(face_vertices)} vertices; expected >= 3."
+                f"Face {face_index} has {len(face_vertices)} "
+                "vertices; expected >= 3."
             )
 
         for vertex in face_vertices:
             if not 0 <= vertex < num_vertices:
                 raise ValueError(
-                    f"Face {face_index} references out-of-range vertex {vertex} "
-                    f"(num_vertices={num_vertices})."
+                    f"Face {face_index} references out-of-range "
+                    f"vertex {vertex} (num_vertices={num_vertices})."
                 )
 
         cycle: list[int] = []
@@ -392,7 +408,10 @@ def dart_map_from_face_lists(
         for i, u in enumerate(face_vertices):
             v = face_vertices[(i + 1) % face_len]
             if u == v:
-                raise ValueError(f"Face {face_index} contains a zero-length edge ({u}, {v}).")
+                raise ValueError(
+                    f"Face {face_index} contains a zero-length "
+                    f"edge ({u}, {v})."
+                )
             key = (u, v)
             if key in directed_to_dart:
                 raise ValueError(
@@ -417,7 +436,8 @@ def dart_map_from_face_lists(
         twin = directed_to_dart.get((v, u))
         if twin is None:
             raise ValueError(
-                f"Missing opposite directed edge for ({u}, {v}); mesh is not closed."
+                f"Missing opposite directed edge for ({u}, {v}); "
+                "mesh is not closed."
             )
         alpha[d] = twin
 

@@ -89,6 +89,9 @@ select = [
 ]
 ignore = ["D203", "D213", "D100", "D104"]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["D103"]
+
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
