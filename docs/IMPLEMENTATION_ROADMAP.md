@@ -12,9 +12,10 @@ PolyGraph is a research library for polyhedral topology built on combinatorial m
 
 ### Geometry Pipeline
 
-The system separates topology from geometry and treats floating-point as the
-working representation. An exact geometry backend (CGAL) is available as an
-escape hatch when numeric methods become unreliable:
+The system is designed to separate topology from geometry and to treat
+floating-point as the working representation. In later phases (see Phase 13),
+an exact geometry backend (CGAL) is planned as an escape hatch when numeric
+methods become unreliable:
 
 ```
 Topology (DartMap)
@@ -36,14 +37,14 @@ Validation & Diagnostics
                          Visualization / Export
 ```
 
-The pipeline stays fast by remaining numeric most of the time. Exact
-arithmetic is invoked only when validation detects degeneracies, constraint
-violations, or numerical instability. The minimal CGAL integration consists
-of: the exact kernel (EPECK), `Plane_3`, a mesh structure (`Surface_mesh`
-or `Polyhedron_3`), and optionally convex hull / halfspace intersection
-algorithms. This combination can verify planes, reconstruct exact vertices
-when numeric methods fail, and convert the result back to float64 for
-rendering.
+The pipeline is intended to stay fast by remaining numeric most of the time.
+Exact arithmetic will be invoked only when validation detects degeneracies,
+constraint violations, or numerical instability. The minimal CGAL integration
+planned for this phase consists of: the exact kernel (EPECK), `Plane_3`, a
+mesh structure (`Surface_mesh` or `Polyhedron_3`), and optionally convex hull
+/ halfspace intersection algorithms. This combination will verify planes,
+reconstruct exact vertices when numeric methods fail, and convert the result
+back to float64 for rendering.
 
 ---
 
