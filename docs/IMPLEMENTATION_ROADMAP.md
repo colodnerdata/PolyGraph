@@ -40,7 +40,7 @@ Validation & Diagnostics
 The pipeline is intended to stay fast by remaining numeric most of the time.
 Exact arithmetic will be invoked only when validation detects degeneracies,
 constraint violations, or numerical instability. The minimal CGAL integration
-planned for this phase consists of: the exact kernel (EPECK), `Plane_3`, a
+planned for Phase 13 consists of: the exact kernel (EPECK), `Plane_3`, a
 mesh structure (`Surface_mesh` or `Polyhedron_3`), and optionally convex hull
 / halfspace intersection algorithms. This combination will verify planes,
 reconstruct exact vertices when numeric methods fail, and convert the result
@@ -926,9 +926,12 @@ Controlled conversion from exact to numeric:
 The `realize()` function in `geometry/polyhedral/optimizer.py` gains an
 optional `validate=True` parameter. When enabled, the full pipeline is:
 
+*API sketch — not yet implemented (planned for Phases 11–13):*
+
 ```python
 from dataclasses import replace
 
+dm = ...  # some DartMap
 result = realize(dm)                              # Phase 11: numeric
 report = validate_realization(result, dm)         # Phase 12: diagnostics
 if report.status == "UNSTABLE":
@@ -1017,6 +1020,8 @@ if report.status == "UNSTABLE":
 
 Each phase includes tests. The end-to-end pipeline test after Phase 9:
 
+*API sketch — not yet implemented (planned for Phase 9):*
+
 ```python
 from polygraph.generators.platonic import cube
 from polygraph.algorithms.triangulation.augment import triangulate
@@ -1035,28 +1040,42 @@ render_walkthrough_matplotlib(frames, output_path="cube_walkthrough.gif")
 ```
 
 After Phase 11 (numeric realization):
+
+*API sketch — not yet implemented (planned for Phase 11):*
+
 ```python
 from polygraph.geometry.polyhedral.optimizer import realize
-result = realize(cube())
+
+dm = ...  # some DartMap
+result = realize(dm)
 ```
 
 After Phase 12 (validated pipeline):
+
+*API sketch — not yet implemented (planned for Phase 12):*
+
 ```python
 from polygraph.geometry.polyhedral.optimizer import realize
 from polygraph.geometry.validation.stability import validate_realization
 
-result = realize(cube())
-report = validate_realization(result, cube())
+dm = ...  # some DartMap
+result = realize(dm)
+report = validate_realization(result, dm)
 assert report.status == "STABLE"
 ```
 
 After Phase 13 (with exact fallback):
+
+*API sketch — not yet implemented (planned for Phase 13):*
+
 ```python
+from dataclasses import replace
 from polygraph.geometry.polyhedral.optimizer import realize
 from polygraph.geometry.validation.stability import validate_realization
 from polygraph.geometry.exact.reconstruction import reconstruct_vertices_exact
 
-result = realize(tricky_polyhedron)
+dm = ...  # some DartMap
+result = realize(dm)
 report = validate_realization(result, dm)
 if report.status == "UNSTABLE":
     vertices = reconstruct_vertices_exact(
@@ -1064,7 +1083,8 @@ if report.status == "UNSTABLE":
         result.face_planes.offsets,
         dm,
     )
-    # vertices are now reliable float64 from exact computation
+    result = replace(result, vertices=vertices)
+# proceed to visualization / export
 ```
 
 Run at each phase:

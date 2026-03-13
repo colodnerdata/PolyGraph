@@ -31,25 +31,20 @@ python -m build
 
 PolyGraph is a research library for polyhedral topology built on **combinatorial maps** (dart maps). It enforces strict separation of concerns across layers:
 
-```
-Visualization  (matplotlib, SVG, three.js)
-     ↑
-Export         (OBJ, JSON, SVG)
-     ↑
-Geometry       (planar layout, 3D polyhedral realization)
-     │
-     ├── Validation & Diagnostics  (numeric stability checks)
-     │        │
-     │        └── Exact Geometry   (CGAL fallback when unstable)
-     │                │
-     │                └── ► stable float64 coords ─┐
-     │                                             │
-     ↑─────────────────────────────────────────────┘
-Algorithms     (symmetry, planar embedding, triangulation)
-     ↑
-Structures     (DartMap, Permutation, Traversal)  ← current focus
-     ↑
-Generators     (Platonic solids, prisms, Conway operators)
+```mermaid
+flowchart TD
+    Gen["Generators\n(Platonic solids, prisms, Conway operators)"]
+    Struct["Structures\n(DartMap, Permutation, Traversal) ← current focus"]
+    Algo["Algorithms\n(symmetry, planar embedding, triangulation)"]
+    Geo["Geometry\n(planar layout, 3D polyhedral realization)"]
+    Val["Validation & Diagnostics\n(numeric stability checks)"]
+    Exact["Exact Geometry\n(CGAL fallback when unstable)"]
+    Export["Export\n(OBJ, JSON, SVG)"]
+    Viz["Visualization\n(matplotlib, SVG, three.js)"]
+
+    Gen --> Struct --> Algo --> Geo --> Export --> Viz
+    Geo --> Val --> Exact
+    Exact -->|"stable float64 coords"| Geo
 ```
 
 The geometry pipeline is **planned** to stay numeric (float64) by default.
