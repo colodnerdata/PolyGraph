@@ -23,6 +23,7 @@ def test_prism_family_generators_return_sphere_maps(
     assert len(dm.vertex_orbits()) == 2 * n
     assert dm.num_edges == num_edges
     assert len(dm.face_orbits()) == num_faces
+    assert len(dm.connected_components()) == 1
     assert dm.genus() == 0
 
 
