@@ -44,7 +44,7 @@ back to float64 for rendering.
 
 **Why first:** Every subsequent layer needs concrete DartMaps to test against. Currently the only test fixture is a hand-built tetrahedron in test_traversal.py.
 
-### 1a. `generators/prisms.py`
+### 1a. `generators/prisms.py` ✅ Complete
 | Function | V | E | F | Notes |
 |---|---|---|---|---|
 | `prism(n)` | 2n | 3n | n+2 | Two n-gon caps + n quads; n≥3 |
@@ -52,7 +52,7 @@ back to float64 for rendering.
 
 **Math:** Parametric face generation from cyclic index arithmetic (mod n). The formulas above apply for n≥3.
 
-### 1b. `generators/platonic.py`
+### 1b. `generators/platonic.py` ✅ Complete
 Each function returns `DartMap.from_face_lists(faces, num_vertices)`.
 
 | Function | V | E | F | Face sizes | Math needed |
@@ -65,7 +65,7 @@ Each function returns `DartMap.from_face_lists(faces, num_vertices)`.
 
 **Minimum math:** Just hardcoded oriented face lists. Verify via Euler characteristic (V - E + F = 2) and genus (0).
 
-### 1c. `generators/johnson.py` (subset)
+### 1c. `generators/johnson.py` (subset) ✅ Complete
 
 Within Phase 1, only implement the two simplest parametric families. All 92 will be added in
 later phases as the face-winding machinery matures. Pyramid(4) and Pyramid(5) are Johnson solids.

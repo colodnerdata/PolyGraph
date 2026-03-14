@@ -1,6 +1,7 @@
 """Public generators API."""
 from __future__ import annotations
 
+from polygraph.generators.johnson import bipyramid, dipyramid, pyramid
 from polygraph.generators.platonic import (
     cube,
     dodecahedron,
@@ -18,4 +19,7 @@ __all__ = [
     "icosahedron",
     "prism",
     "antiprism",
+    "pyramid",
+    "dipyramid",
+    "bipyramid",
 ]
