@@ -1,23 +1,88 @@
 """Johnson solid generators.
 
-Parametric generators for pyramid and bipyramid families, plus individual
-stubs for the Johnson solids that are convex deltahedra but have no simple
-parametric form.  Stubs raise ``NotImplementedError`` until implemented.
+Parametric generators for pyramid and dipyramid families, plus individual
+stubs for Johnson solids that are convex deltahedra but have no simple
+parametric form. Stubs raise ``NotImplementedError`` until implemented.
 
-Each function will return ``DartMap.from_face_lists(faces, num_vertices)``.
+Each function returns ``DartMap.from_face_lists(faces, num_vertices)``.
 """
 
 from __future__ import annotations
 
+from polygraph.structures.dart_map import DartMap
 
-def pyramid(n):
-    """Return the n-gonal pyramid.  V=n+1, E=2n, F=n+1."""
-    raise NotImplementedError
+__all__ = [
+    "pyramid",
+    "dipyramid",
+    "bipyramid",
+    "snub_disphenoid",
+    "triaugmented_triangular_prism",
+    "gyroelongated_square_bipyramid",
+]
 
 
-def bipyramid(n):
-    """Return the n-gonal bipyramid.  V=n+2, E=3n, F=2n."""
-    raise NotImplementedError
+def pyramid(n: int) -> DartMap:
+    """Return the n-gonal pyramid.
+
+    Parameters
+    ----------
+    n : int
+        Number of sides in the base polygon.
+
+    Returns
+    -------
+    DartMap
+        Closed combinatorial map with counts ``(V, E, F) = (n + 1, 2n, n + 1)``.
+
+    Raises
+    ------
+    ValueError
+        If ``n < 3``.
+    """
+    if n < 3:
+        raise ValueError("pyramid(n) requires n >= 3")
+
+    base = list(range(n))
+    apex = n
+
+    faces = [base]
+    faces += [[base[(i + 1) % n], base[i], apex] for i in range(n)]
+    return DartMap.from_face_lists(faces=faces, num_vertices=n + 1)
+
+
+def dipyramid(n: int) -> DartMap:
+    """Return the n-gonal dipyramid.
+
+    Parameters
+    ----------
+    n : int
+        Number of vertices in the equatorial cycle.
+
+    Returns
+    -------
+    DartMap
+        Closed combinatorial map with counts ``(V, E, F) = (n + 2, 3n, 2n)``.
+
+    Raises
+    ------
+    ValueError
+        If ``n < 3``.
+    """
+    if n < 3:
+        raise ValueError("dipyramid(n) requires n >= 3")
+
+    equator = list(range(n))
+    top = n
+    bottom = n + 1
+
+    faces = [[equator[(i + 1) % n], equator[i], top] for i in range(n)]
+    faces += [[equator[i], equator[(i + 1) % n], bottom] for i in range(n)]
+    return DartMap.from_face_lists(faces=faces, num_vertices=n + 2)
+
+
+def bipyramid(n: int) -> DartMap:
+    """Return the n-gonal bipyramid (alias for :func:`dipyramid`)."""
+    return dipyramid(n)
 
 
 # ---------------------------------------------------------------------------
