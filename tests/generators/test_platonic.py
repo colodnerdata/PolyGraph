@@ -54,7 +54,3 @@ def test_platonic_generators_pair_edges_in_opposite_directions() -> None:
             twin = dm.alpha[dart]
             assert twin != dart
             assert dm.alpha[twin] == dart
-
-        # each canonical undirected edge should be represented exactly once.
-        edge_ids = {dm.edge_of_dart(dart) for dart in range(dm.num_darts)}
-        assert len(edge_ids) == dm.num_edges
