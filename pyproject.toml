@@ -33,7 +33,8 @@ classifiers = [
 ]
 
 dependencies = [
-  "numpy>=1.26"
+  "numpy>=1.26",
+  "pynauty>=2.8.8.1",
 ]
 
 [project.optional-dependencies]
