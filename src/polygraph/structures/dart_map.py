@@ -108,7 +108,7 @@ class DartMap:
 
     def __post_init__(self) -> None:
         """Validate and normalize permutation data.
-        
+
         Runs after dataclass initialization.
 
         Raises
