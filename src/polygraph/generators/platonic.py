@@ -7,9 +7,16 @@ oriented face-vertex cycles using
 
 from __future__ import annotations
 
+from polygraph.generators.prisms import antiprism, prism
 from polygraph.structures.dart_map import DartMap
 
-__all__ = ["tetrahedron", "dodecahedron", "icosahedron"]
+__all__ = [
+    "tetrahedron",
+    "cube",
+    "octahedron",
+    "dodecahedron",
+    "icosahedron",
+]
 
 
 def tetrahedron() -> DartMap:
@@ -32,6 +39,36 @@ def tetrahedron() -> DartMap:
         [0, 2, 3],
     ]
     return DartMap.from_face_lists(faces=faces, num_vertices=4)
+
+
+def cube() -> DartMap:
+    """Build the cube map.
+
+    Returns
+    -------
+    DartMap
+        Cube map with counts ``(V, E, F) = (8, 12, 6)``.
+
+    Notes
+    -----
+    The cube is equivalent to the square prism.
+    """
+    return prism(4)
+
+
+def octahedron() -> DartMap:
+    """Build the octahedron map.
+
+    Returns
+    -------
+    DartMap
+        Octahedron map with counts ``(V, E, F) = (6, 12, 8)``.
+
+    Notes
+    -----
+    The octahedron is equivalent to the triangular antiprism.
+    """
+    return antiprism(3)
 
 
 def dodecahedron() -> DartMap:

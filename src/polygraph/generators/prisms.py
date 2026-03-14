@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from polygraph.structures.dart_map import DartMap
 
+__all__ = ["prism", "antiprism"]
+
 
 def prism(n: int) -> DartMap:
     """Return the n-gonal prism.
