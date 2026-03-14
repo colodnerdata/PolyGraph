@@ -1,4 +1,5 @@
 """Public generators API."""
+from __future__ import annotations
 
 from polygraph.generators.platonic import (
     cube,
