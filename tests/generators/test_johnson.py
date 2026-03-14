@@ -20,7 +20,11 @@ def test_pyramid_counts(n: int, expected_counts: tuple[int, int, int]) -> None:
     dm = pyramid(n)
 
     assert isinstance(dm, DartMap)
-    assert (len(dm.vertex_orbits()), dm.num_edges, len(dm.face_orbits())) == expected_counts
+    num_vertices = len(dm.vertex_orbits())
+    num_edges = dm.num_edges
+    num_faces = len(dm.face_orbits())
+
+    assert (num_vertices, num_edges, num_faces) == expected_counts
     assert dm.euler_characteristic() == 2
     assert dm.genus() == 0
 
@@ -37,7 +41,11 @@ def test_dipyramid_counts(n: int, expected_counts: tuple[int, int, int]) -> None
     dm = dipyramid(n)
 
     assert isinstance(dm, DartMap)
-    assert (len(dm.vertex_orbits()), dm.num_edges, len(dm.face_orbits())) == expected_counts
+    num_vertices = len(dm.vertex_orbits())
+    num_edges = dm.num_edges
+    num_faces = len(dm.face_orbits())
+
+    assert (num_vertices, num_edges, num_faces) == expected_counts
     assert dm.euler_characteristic() == 2
     assert dm.genus() == 0
 
