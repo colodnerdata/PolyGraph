@@ -142,7 +142,7 @@ class Permutation:
 
         Notes
         -----
-        This generator emits each orbit element exactly once in traversal order.
+        This generator emits each orbit element exactly once, in order.
         """
         mapping = self.mapping
         n = len(mapping)
