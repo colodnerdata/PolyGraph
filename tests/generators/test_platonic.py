@@ -4,7 +4,13 @@ from __future__ import annotations
 
 import pytest
 
-from polygraph.generators.platonic import dodecahedron, icosahedron, tetrahedron
+from polygraph.generators.platonic import (
+    cube,
+    dodecahedron,
+    icosahedron,
+    octahedron,
+    tetrahedron,
+)
 from polygraph.structures.dart_map import DartMap
 
 
@@ -17,6 +23,8 @@ from polygraph.structures.dart_map import DartMap
     ),
     [
         (tetrahedron, (4, 6, 4), 3, 3),
+        (cube, (8, 12, 6), 4, 3),
+        (octahedron, (6, 12, 8), 3, 4),
         (dodecahedron, (20, 30, 12), 5, 3),
         (icosahedron, (12, 30, 20), 3, 5),
     ],
@@ -46,7 +54,13 @@ def test_platonic_generators_return_expected_topology(
 
 
 def test_platonic_generators_pair_edges_in_opposite_directions() -> None:
-    for generator in (tetrahedron, dodecahedron, icosahedron):
+    for generator in (
+        tetrahedron,
+        cube,
+        octahedron,
+        dodecahedron,
+        icosahedron,
+    ):
         dm = generator()
 
         # alpha involution guarantees opposite orientation pairing for each edge.
