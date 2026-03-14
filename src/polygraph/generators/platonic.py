@@ -1,8 +1,8 @@
 """Generators for selected Platonic solids via explicit face cycles.
 
 The generators in this module construct combinatorial maps directly from
-oriented face-vertex cycles using :meth:`polygraph.structures.dart_map.DartMap.
-from_face_lists`.
+oriented face-vertex cycles using
+:meth:`polygraph.structures.dart_map.DartMap.from_face_lists`.
 """
 
 from __future__ import annotations
