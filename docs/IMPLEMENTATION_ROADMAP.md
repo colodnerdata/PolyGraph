@@ -21,10 +21,10 @@ methods become unreliable:
 flowchart TD
     Top["Topology (DartMap)"] --> Num["Numeric Geometry (float64 optimization)"]
     Num --> Val["Validation & Diagnostics"]
-    
+
     Val -- "pass" --> VizExport1["Visualization / Export"]
     Val -- "instability" --> Exact["Exact Geometry (CGAL)"]
-    
+
     Exact --> Stable["Stable float64 coords"]
     Stable --> VizExport2["Visualization / Export"]
 ```
