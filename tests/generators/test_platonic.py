@@ -9,7 +9,12 @@ from polygraph.structures.dart_map import DartMap
 
 
 @pytest.mark.parametrize(
-    ("generator", "expected_counts", "expected_face_size", "expected_vertex_degree"),
+    (
+        "generator",
+        "expected_counts",
+        "expected_face_size",
+        "expected_vertex_degree",
+    ),
     [
         (tetrahedron, (4, 6, 4), 3, 3),
         (dodecahedron, (20, 30, 12), 5, 3),
