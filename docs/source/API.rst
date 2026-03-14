@@ -1,6 +1,21 @@
 API reference
 =============
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Implementation phases
+
+   phase1/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Module reference
+
+   modules/polygraph.generators
+   modules/polygraph.generators.prisms
+   modules/polygraph.generators.platonic
+   modules/polygraph.generators.johnson
+
 Structures
 ----------
 
