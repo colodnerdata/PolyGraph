@@ -1,4 +1,5 @@
 """Top-level PolyGraph public API."""
+from __future__ import annotations
 
 from polygraph.generators import (
     antiprism,
