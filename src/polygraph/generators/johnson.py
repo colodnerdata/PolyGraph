@@ -47,7 +47,10 @@ def pyramid(n: int) -> DartMap:
 
     faces = [base]
     faces += [[base[(i + 1) % n], base[i], apex] for i in range(n)]
-    return DartMap.from_face_lists(faces=faces, num_vertices=n + 1)
+    return DartMap.from_face_lists(
+        faces=faces,
+        num_vertices=n + 1,
+    )
 
 
 def dipyramid(n: int) -> DartMap:
