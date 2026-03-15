@@ -154,5 +154,5 @@ def dartmap_automorphisms(
 
     n = dm.num_darts
     generators = [Permutation.from_sequence(gen[:n]) for gen in raw_gens]
-    group_order = round(grpsize1) * (10**grpsize2)
+    group_order = int(round(grpsize1 * (10**grpsize2)))
     return generators, group_order
