@@ -37,9 +37,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-symmetry = [
-  "pynauty"
-]
 
 planar = [
   "networkx>=3.2"
