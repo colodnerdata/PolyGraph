@@ -68,7 +68,9 @@ def orbit(start: int, perm: Permutation) -> Iterator[int]:
         If ``start`` is outside ``[0, len(perm))``.
     """
     if not 0 <= start < len(perm):
-        raise IndexError(f"Start index out of range for orbit traversal: {start}.")
+        raise IndexError(
+            f"Start index out of range for orbit traversal: {start}."
+        )
 
     i = start
     while True:

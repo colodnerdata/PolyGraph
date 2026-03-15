@@ -9,8 +9,8 @@
 # Bash scripts
 *.sh text eol=lf
 
-# Explicitly declare text files you want to always be normalized and converted
-# to native line endings on checkout.
+# Explicitly declare text files you want to always be normalized
+# and checked out with LF line endings.
 *.c text
 *.h text
 *.py text
