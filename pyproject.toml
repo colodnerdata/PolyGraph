@@ -33,7 +33,7 @@ classifiers = [
 ]
 
 dependencies = [
-  "numpy>=1.26"
+  "numpy>=1.26",
 ]
 
 [project.optional-dependencies]
@@ -47,6 +47,10 @@ opt = [
 
 viz = [
   "matplotlib>=3.8"
+]
+
+symmetry = [
+  "pynauty>=2.8.8.1",
 ]
 
 dev = [
