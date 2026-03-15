@@ -207,4 +207,4 @@ marimo/_lsp/
 __marimo__/
 
 # Claude Code
-.claude/settings.local.json
+.claude/*
