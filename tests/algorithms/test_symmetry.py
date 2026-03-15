@@ -2,6 +2,8 @@
 
 import pytest
 
+pytest.importorskip("pynauty")
+
 from polygraph.algorithms.symmetry import (
     automorphism_group_order,
     compute_automorphism_generators,
