@@ -187,7 +187,7 @@ def classify_symmetry(
 
     Raises
     ------
-    UnknownSymmetry
+    :class:`UnknownSymmetryError`
         If the automorphism group cannot be matched to a supported point group.
 
     Notes
