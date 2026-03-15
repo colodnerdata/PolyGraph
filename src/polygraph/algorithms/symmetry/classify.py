@@ -41,8 +41,9 @@ from polygraph.structures.traversal import face_darts
 class UnknownSymmetryError(ValueError):
     """Raised when the automorphism group cannot be matched to a known group.
 
-    This may occur for polyhedra with symmetry groups not yet covered by
-    the classifier (e.g. chiral solids or very unusual topologies).
+    This may occur for polyhedra whose symmetry groups are not yet handled by
+    the classifier (for example, certain unsupported chiral groups such as
+    some tetrahedral ``T`` variants, or very unusual topologies).
     """
 
 
