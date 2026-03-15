@@ -475,17 +475,17 @@ Target Option A from the start; Option B is a compatibility fallback, not the pr
 **Math:** Group order alone is insufficient — orbit structure and face size distribution
 are also required to uniquely identify the group. Full decision table:
 
-| Group | \|Aut\| | nv | nf | Additional condition |
-|-------|---------|----|----|----------------------|
-| I_h   | 120     | 1  | 1  | flag-transitive      |
-| I     | 60      | 1  | 1  | flag-transitive, chiral |
-| O_h   | 48      | 1  | 1  | flag-transitive      |
-| T_d   | 24      | 1  | 1  | has reflections      |
-| O     | 24      | 1  | 1  | no reflections (chiral) |
-| D_nh  | 4n      | 1  | 2  | lateral face size ≠ 3 (prism) |
-| D_nd  | 4n      | 1  | 2  | lateral face size = 3 (antiprism) |
-| D_nh  | 4n      | 2  | 1  | (dipyramid)          |
-| C_nv  | 2n      | 2  | 2  | (pyramid)            |
+| Group | Aut | nv | nf | Additional condition |
+|-------|-----|----|----|----------------------|
+| I_h   | 120 | 1  | 1  | flag-transitive      |
+| I     | 60  | 1  | 1  | flag-transitive, chiral |
+| O_h   | 48  | 1  | 1  | flag-transitive      |
+| T_d   | 24  | 1  | 1  | has reflections      |
+| O     | 24  | 1  | 1  | no reflections (chiral) |
+| D_nh  | 4n  | 1  | 2  | lateral face size ≠ 3 (prism) |
+| D_nd  | 4n  | 1  | 2  | lateral face size = 3 (antiprism) |
+| D_nh  | 4n  | 2  | 1  | (dipyramid)          |
+| C_nv  | 2n  | 2  | 2  | (pyramid)            |
 
 *nv* = number of vertex orbits, *nf* = number of face orbits.
 
