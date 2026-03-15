@@ -11,6 +11,8 @@ the full group orbit partition.
 
 from __future__ import annotations
 
+from collections import defaultdict
+
 from polygraph.structures.dart_map import DartMap
 from polygraph.structures.permutation import Permutation
 
@@ -41,8 +43,6 @@ def _union(parent: list[int], a: int, b: int) -> None:
 
 def _collect_orbits(parent: list[int]) -> list[list[int]]:
     """Convert a union-find parent array into a list of orbit lists."""
-    from collections import defaultdict
-
     groups: dict[int, list[int]] = defaultdict(list)
     for i in range(len(parent)):
         groups[_find(parent, i)].append(i)

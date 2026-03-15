@@ -27,11 +27,18 @@ from polygraph.algorithms.symmetry.orbits import (
     vertex_orbits,
 )
 from polygraph.algorithms.symmetry.point_groups import (
+    C_I,
+    C_S,
     PointGroup,
     cyclic,
+    cyclic_horizontal,
+    cyclic_pure,
     dihedral,
+    dihedral_chiral,
     icosahedral,
+    improper,
     octahedral,
+    pyritohedral,
     tetrahedral,
 )
 
@@ -49,11 +56,21 @@ __all__ = [
     # classification
     "classify_symmetry",
     "UnknownSymmetryError",
-    # point groups
+    # point groups — polyhedral
     "PointGroup",
-    "cyclic",
-    "dihedral",
     "tetrahedral",
+    "pyritohedral",
     "octahedral",
     "icosahedral",
+    # point groups — dihedral
+    "dihedral",
+    "dihedral_chiral",
+    # point groups — cyclic
+    "cyclic",
+    "cyclic_pure",
+    "cyclic_horizontal",
+    # point groups — improper / special
+    "improper",
+    "C_S",
+    "C_I",
 ]

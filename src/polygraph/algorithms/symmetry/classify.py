@@ -30,6 +30,7 @@ from polygraph.algorithms.symmetry.point_groups import (
     dihedral,
     icosahedral,
     octahedral,
+    pyritohedral,
     tetrahedral,
 )
 from polygraph.structures.dart_map import DartMap
@@ -94,6 +95,67 @@ def _has_reflection(
     return any(not is_orientation_preserving(g, dm) for g in generators)
 
 
+def _center_has_reflection(
+    generators: list[Permutation], dm: DartMap
+) -> bool:
+    """Return True if the centre contains an orientation-reversing element.
+
+    Parameters
+    ----------
+    generators : list[Permutation]
+        Generating set for Aut(dm).
+    dm : DartMap
+        Input dart map.
+
+    Returns
+    -------
+    bool
+        ``True`` if some orientation-reversing group element commutes with
+        every generator (i.e. it lies in the centre of the group).
+
+    Notes
+    -----
+    This is the combinatorial discriminant between T_d and T_h.  Both groups
+    have order 24 and the same orbit structure (flag-transitive), but:
+
+    * T_h = T × {E, i}: the inversion ``i`` is a central element of order 2
+      that reverses orientation → ``_center_has_reflection`` returns True.
+    * T_d: all orientation-reversing elements (σ_d, S_4) are non-central
+      → ``_center_has_reflection`` returns False.
+
+    The check enumerates the full group via BFS (at most 24 elements for the
+    cases where this function is called), so performance is not a concern.
+    """
+    if not generators:
+        return False
+
+    n = dm.num_darts
+    identity = Permutation.identity(n)
+    seen: set[tuple[int, ...]] = {identity.mapping}
+    queue: list[Permutation] = [identity]
+    all_gens = generators + [g.inverse() for g in generators]
+
+    while queue:
+        current = queue.pop()
+        for g in all_gens:
+            nxt = current.compose(g)
+            if nxt.mapping not in seen:
+                seen.add(nxt.mapping)
+                queue.append(nxt)
+
+    for raw in seen:
+        elem = Permutation.from_sequence(list(raw))
+        if is_orientation_preserving(elem, dm):
+            continue
+        # Central iff it commutes with every generator
+        if all(
+            elem.compose(g).mapping == g.compose(elem).mapping
+            for g in generators
+        ):
+            return True
+    return False
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -140,8 +202,9 @@ def classify_symmetry(
     120     1    1    —                                  I_h
     60      1    1    —                                  I
     48      1    1    —                                  O_h
-    24      1    1    has reflection                     T_d
     24      1    1    no reflection                      O
+    24      1    1    central reflection present         T_h
+    24      1    1    reflection, no central reflection  T_d
     4n      2    1    —                                  D_nh  (dipyramid)
     4n      1    2    lateral face size ≠ 3              D_nh  (prism)
     4n      1    2    lateral face size = 3              D_nd  (antiprism)
@@ -177,13 +240,15 @@ def classify_symmetry(
     if order == 48 and nv == 1 and nf == 1:
         return octahedral(full=True)
 
-    # --- Order-24 flag-transitive: T_d vs O ---
+    # --- Order-24 flag-transitive: T_d vs T_h vs O ---
     # prism(6) and antiprism(6) also have order=24, but their nf=2, so the
-    # nf==1 guard here is necessary and sufficient for the Platonic/T_d case.
+    # nf==1 guard here is necessary and sufficient for this three-way split.
     if order == 24 and nv == 1 and nf == 1:
-        if _has_reflection(generators, dm):
-            return tetrahedral(full=True)   # tetrahedron → T_d
-        return octahedral(full=False)       # chiral octahedral → O
+        if not _has_reflection(generators, dm):
+            return octahedral(full=False)           # chiral octahedral → O
+        if _center_has_reflection(generators, dm):
+            return pyritohedral()                   # pyritohedral → T_h
+        return tetrahedral(full=True)               # tetrahedral → T_d
 
     # --- Dihedral family: order = 4n ---
     if order % 4 == 0:
