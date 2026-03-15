@@ -87,6 +87,8 @@ def dihedral(n: int, variant: str = "h") -> PointGroup:
     n-gon base.  D_nd is the symmetry group of a right antiprism.  Both have
     order 4n, but they differ in whether a horizontal mirror plane exists.
     """
+    if n < 2:
+        raise ValueError(f"n must be >= 2 for dihedral point groups, got {n}")
     if variant not in ("h", "d"):
         raise ValueError(f"variant must be 'h' or 'd', got {variant!r}")
     return PointGroup(name=f"D_{n}{variant}", order=4 * n)
