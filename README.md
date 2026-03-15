@@ -85,8 +85,8 @@ from polygraph.algorithms.symmetry.orbits import vertex_orbits
 
 mesh = cube()
 
-print(mesh.num_vertices())   # 8
-print(mesh.num_faces())      # 6
+print(len(mesh.vertex_orbits()))   # 8
+print(len(mesh.face_orbits()))     # 6
 
 generators = compute_automorphism_generators(mesh)
 print(automorphism_group_order(generators, mesh.num_darts))  # 48
