@@ -1,0 +1,11 @@
+This file documents how to run mypy on the test suite instead of storing a snapshot of past mypy errors.
+
+To run mypy against the tests, use a command like:
+
+    mypy tests
+
+Make sure the mypy configuration for this repository is available (for example, via a mypy.ini or pyproject.toml),
+and that all required runtime dependencies are installed in your environment.
+
+The expectation is that mypy completes without errors. If mypy reports issues, fix them in the codebase rather than
+updating this file with raw tool output.

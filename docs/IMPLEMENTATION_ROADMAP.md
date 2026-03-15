@@ -470,7 +470,7 @@ Any automorphism of this colored graph that permutes dart vertices satisfies `pi
 
 ---
 
-## Phase 3: Symmetry Classification & Point Groups
+## Phase 3: Symmetry Classification & Point Groups ✅ Complete
 
 ### 3a. `algorithms/symmetry/point_groups.py`
 - Define point group templates as named tuples: `(name, order, generators_pattern)`
@@ -481,7 +481,27 @@ Any automorphism of this colored graph that permutes dart vertices satisfies `pi
 - `classify_symmetry(generators, dm) -> str`: Match computed automorphism group against known point group templates
 - Uses group order + orbit structure to narrow candidates
 
-**Math:** Group order determines the family. |Aut|=24 on a solid with 1 vertex orbit → tetrahedral. |Aut|=48 → octahedral. |Aut|=120 → icosahedral. |Aut|=4n with 2 vertex orbits → full dihedral (prism) symmetry, typically denoted D_nh (or D_nd). Restricting to orientation-preserving automorphisms gives order 2n (dihedral D_n).
+**Math:** Group order alone is insufficient — orbit structure and face size distribution
+are also required to uniquely identify the group. Full decision table:
+
+| Group | Aut | nv | nf | Additional condition |
+|-------|-----|----|----|----------------------|
+| I_h   | 120 | 1  | 1  | flag-transitive      |
+| I     | 60  | 1  | 1  | flag-transitive, chiral |
+| O_h   | 48  | 1  | 1  | flag-transitive      |
+| T_d   | 24  | 1  | 1  | has reflections      |
+| O     | 24  | 1  | 1  | no reflections (chiral) |
+| D_nh  | 4n  | 1  | 2  | lateral face size ≠ 3 (prism) |
+| D_nd  | 4n  | 1  | 2  | lateral face size = 3 (antiprism) |
+| D_nh  | 4n  | 2  | 1  | (dipyramid)          |
+| C_nv  | 2n  | 2  | 2  | (pyramid)            |
+
+*nv* = number of vertex orbits, *nf* = number of face orbits.
+
+Note on orbit counts: prisms have **nv=1** because the horizontal mirror σ_h maps the
+top vertex ring onto the bottom ring, making all 2n vertices equivalent. Dipyramids
+have **nv=2** because the two apex vertices form one orbit and the n equatorial vertices
+form another — there is no symmetry operation that maps an apex to an equatorial vertex.
 
 ### Files
 - `src/polygraph/algorithms/symmetry/point_groups.py`
