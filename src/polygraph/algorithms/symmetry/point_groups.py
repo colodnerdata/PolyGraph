@@ -250,18 +250,20 @@ def cyclic(n: int) -> PointGroup:
     Parameters
     ----------
     n : int
-        Fold order of the principal axis; n ≥ 1.
+    Fold order of the principal axis; n ≥ 1.
 
     Returns
     -------
     PointGroup
-        ``C_nv`` with order ``2n``.
+    ``C_nv`` with order ``2n``.
 
     Notes
     -----
     C_nv is the symmetry group of a right pyramid with a regular n-gon base:
     one n-fold rotation axis and n vertical mirror planes, giving order 2n.
     """
+    if n < 1:
+    raise ValueError(f"n must be >= 1 for cyclic groups, got {n}")
     return PointGroup(name=f"C_{n}v", order=2 * n)
 
 
