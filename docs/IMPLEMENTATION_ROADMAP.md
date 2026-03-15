@@ -2,7 +2,13 @@
 
 ## Context
 
-PolyGraph is a research library for polyhedral topology built on combinatorial maps. The **Structures layer is complete** (permutation, dart_map, traversal — ~1060 lines). Everything else — generators, algorithms, geometry, visualization, export, interop — exists as empty stubs. This plan sequences the implementation of all remaining layers, respecting dependency order and minimizing mathematical machinery at each stage.
+PolyGraph is a research library for polyhedral topology built on combinatorial maps. The following layers are implemented:
+
+- **Structures** ✅ — `permutation`, `dart_map`, `traversal` (~1060 lines)
+- **Generators** ✅ — `platonic`, `prisms`, `johnson` (pyramid/dipyramid families); `archimedean` and `catalan` are stubs deferred to Phase 10
+- **Symmetry algorithms** ✅ — `algorithms/symmetry/automorphisms`, `algorithms/symmetry/orbits`, `interop/pynauty_adapter`
+
+Everything else — planar algorithms, triangulation, geometry, visualization, export, remaining interop adapters — exists as empty stubs. This plan sequences the implementation of all remaining layers, respecting dependency order and minimizing mathematical machinery at each stage.
 
 **Guiding principles for a research package:**
 - Implement the simplest correct version first; optimize later
@@ -420,21 +426,24 @@ def vertex_configuration(dm: DartMap) -> str:
 - tests added to `tests/generators/test_platonic.py` and `tests/generators/test_prisms.py`
 ---
 
-## Phase 2: Symmetry Detection
+## Phase 2: Symmetry Detection ✅
 
 **Why now:** Symmetry detection depends only on the DartMap structure and the generators from Phase 1. Establishing the automorphism pipeline early enables symmetry-constrained optimization in later phases (geometry, layout refinement) and provides a clean validation target using well-understood Platonic solid symmetry groups.
 
-### 2a. `interop/bliss_adapter.py`
-BLISS (and nauty) compute automorphism generators via canonical labeling — use them directly rather than brute-forcing:
-- **Option A (preferred):** Use `pynauty` or `python-bliss` bindings. Build a graph from the DartMap in a way that uniquely encodes the permutations `sigma` and `alpha`:
-  - One vertex per dart.
-  - Encode `sigma` and `alpha` as distinct edge types so that any graph automorphism necessarily commutes with both permutations.
-  - If the backend supports directed and/or colored edges, use directed, edge-colored arcs: e.g., a directed edge of color `SIGMA` from `d` to `sigma(d)` and a directed edge of color `ALPHA` from `d` to `alpha(d)`.
-  - If the backend only supports undirected, uncolored graphs, use a gadget/vertex-coloring scheme that breaks the symmetry between `sigma` vs `sigma^{-1}` and between `sigma` vs `alpha` (for example, introduce intermediate “sigma-edge” and “alpha-edge” vertices with distinct colors, or split each dart into in/out variants per permutation). The crucial requirement is that the encoding does **not** admit extra symmetries beyond DartMap automorphisms.
-  - Call the library on this encoded graph to obtain automorphism generators and map them back to permutations on darts.
-- **Option B (fallback only):** Pure-Python backtracking with pruning for environments where BLISS/nauty are unavailable (viable for polyhedra ≤ 120 darts), using the **same DartMap→graph encoding** as in Option A so that the computed automorphism group matches the BLISS/nauty semantics.
+### 2a. `interop/pynauty_adapter.py` ✅
 
-Target Option A from the start; Option B is a compatibility fallback, not the primary path. The well-understood Platonic solid examples (tetrahedron, cube, icosahedron) serve as validation against known group orders.
+nauty (via `pynauty`) computes automorphism generators using canonical labeling — faster and more correct than brute-forcing, especially for larger polyhedra.
+
+**Encoding:** Build an undirected, vertex-colored graph with `5n/2` vertices in three color classes:
+- **Dart vertices** `0..n-1` (color 0) — one per dart.
+- **Phi-arc gadgets** `n..2n-1` (color 1) — gadget `n+d` sits between dart `d` and `phi(d)`, encoding the directed face-traversal step.
+- **Alpha-arc gadgets** `2n..2n+n//2-1` (color 2) — one per undirected edge, connecting the two darts of that edge.
+
+Using **phi-arcs** rather than sigma-arcs is the key design choice: phi-cycles correspond to faces, so gadgets respect face sizes. An automorphism can only map a face of size `k` to another face of size `k`, preventing spurious cross-face-size symmetries that sigma-arc gadgets would admit.
+
+Any automorphism of this colored graph that permutes dart vertices satisfies `pi ∘ alpha = alpha ∘ pi` (from the alpha gadgets) and either `pi ∘ phi = phi ∘ pi` (orientation-preserving) or `pi ∘ phi = phi⁻¹ ∘ pi` (orientation-reversing) — exactly the full polyhedral automorphism group including reflections.
+
+`pynauty.autgrp()` returns raw generators (as permutations on all `5n/2` vertices); the adapter truncates each to the first `n` entries to recover permutations on darts.
 
 ### 2b. `algorithms/symmetry/automorphisms.py`
 - `compute_automorphism_generators(dm) -> list[Permutation]`: Return generating set for Aut(dm)
@@ -454,7 +463,7 @@ Target Option A from the start; Option B is a compatibility fallback, not the pr
 - Prism(5): |Aut| = 20, 2 vertex orbits, 2 edge orbits, 2 face orbits
 
 ### Files
-- `src/polygraph/interop/bliss_adapter.py`
+- `src/polygraph/interop/pynauty_adapter.py`
 - `src/polygraph/algorithms/symmetry/automorphisms.py`
 - `src/polygraph/algorithms/symmetry/orbits.py`
 - `tests/algorithms/test_symmetry.py`

@@ -77,11 +77,22 @@ Example
 
 ```python
 from polygraph.generators.platonic import cube
+from polygraph.algorithms.symmetry.automorphisms import (
+    compute_automorphism_generators,
+    automorphism_group_order,
+)
+from polygraph.algorithms.symmetry.orbits import vertex_orbits
 
 mesh = cube()
 
-print(mesh.num_vertices())
-print(mesh.num_faces())
+print(len(mesh.vertex_orbits()))   # 8
+print(len(mesh.face_orbits()))     # 6
+
+generators = compute_automorphism_generators(mesh)
+print(automorphism_group_order(generators, mesh.num_darts))  # 48
+
+v_orbits = vertex_orbits(generators, mesh)
+print(len(v_orbits))  # 1  (all vertices are equivalent by symmetry)
 ```
 
 ---
@@ -113,15 +124,23 @@ These algorithms provide a foundation for exploring:
 
 Research Roadmap
 
-Near-term goals:
+Completed:
 
-- DartMap topology implementation
-- symmetry detection via automorphism groups
+- DartMap combinatorial map (permutation, dart map, traversal)
+- polyhedron generators: Platonic solids, prisms, antiprisms, pyramids, dipyramids
+- symmetry detection via automorphism groups (pynauty / nauty)
+- dart, vertex, edge, and face orbit decomposition
+
+In progress:
+
+- point group classification (tetrahedral, octahedral, icosahedral, dihedral)
+- dual map construction
+- triangulation of non-triangular faces
+
+Planned:
+
 - planar embeddings using canonical ordering
-- convex grid drawing algorithms
-
-Future exploration:
-
+- convex grid drawing algorithms (Chrobak–Kant, Bekos et al.)
 - disk-link convex grid drawings
 - force-directed planar refinement
 - polyhedral realization via optimization
