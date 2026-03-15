@@ -1,13 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(wc -l /c/Users/colod/Code/PolyGraph/src/polygraph/generators/platonic.py /c/Users/colod/Code/PolyGraph/src/polygraph/generators/*.py)",
-      "Bash(grep -l \"def \" /c/Users/colod/Code/PolyGraph/src/polygraph/generators/*.py)",
-      "Bash(python -m pytest tests/ -v --co -q)",
-      "Bash(python -m pytest tests/structures/test_traversal.py -v)",
-      "Bash(python -m pip install -e .)",
-      "Bash(python -m ruff --version)",
-      "Bash(python -m mypy --version)"
+      "Bash(wc *)",
+      "Bash(grep *)",
+      "Bash(python -m pip install *)",
+      "Bash(python -m build *)",
+      "Bash(python -m ruff *)",
+      "Bash(python -m pytest *)",
+      "Bash(python -m mypy *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git show *)"
     ]
   }
 }
