@@ -1,14 +1,18 @@
 """Tests for symmetry point group classification."""
 
+# pylint: disable=wrong-import-position,missing-function-docstring
+
 import pytest
 
 pytest.importorskip("pynauty")
 
-from polygraph.algorithms.symmetry import (  # noqa: E402
-    classify_symmetry,
-    compute_automorphism_generators,
+from polygraph.algorithms.symmetry.automorphisms import (
+    compute_automorphism_generators,  # noqa: E402
 )
-from polygraph.algorithms.symmetry.classify import UnknownSymmetryError
+from polygraph.algorithms.symmetry.classify import (
+    UnknownSymmetryError,
+    classify_symmetry,  # noqa: E402
+)
 from polygraph.algorithms.symmetry.point_groups import PointGroup
 from polygraph.generators.johnson import dipyramid, pyramid
 from polygraph.generators.platonic import (

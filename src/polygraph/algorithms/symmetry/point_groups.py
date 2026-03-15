@@ -263,7 +263,7 @@ def cyclic(n: int) -> PointGroup:
     one n-fold rotation axis and n vertical mirror planes, giving order 2n.
     """
     if n < 1:
-    raise ValueError(f"n must be >= 1 for cyclic groups, got {n}")
+        raise ValueError(f"n must be >= 1 for cyclic groups, got {n}")
     return PointGroup(name=f"C_{n}v", order=2 * n)
 
 
