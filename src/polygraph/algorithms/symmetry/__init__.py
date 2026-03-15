@@ -7,6 +7,7 @@ structural elements (darts, vertices, edges, faces) into symmetry orbits.
 Automorphism computation delegates to pynauty (which uses nauty internally).
 Install the optional dependency with ``pip install 'polygraph[symmetry]'``.
 """
+from __future__ import annotations
 
 from polygraph.algorithms.symmetry.automorphisms import (
     automorphism_group_order,
