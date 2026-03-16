@@ -106,7 +106,11 @@ def test_johnson_deltahedra_counts(
 
 @pytest.mark.parametrize(
     "generator",
-    [snub_disphenoid, triaugmented_triangular_prism, gyroelongated_square_bipyramid],
+    [
+        snub_disphenoid,
+        triaugmented_triangular_prism,
+        gyroelongated_square_bipyramid,
+    ],
 )
 def test_johnson_deltahedra_euler_characteristic(generator) -> None:
     """New Johnson generators produce sphere-topology maps (χ = 2, genus = 0)."""
@@ -118,7 +122,11 @@ def test_johnson_deltahedra_euler_characteristic(generator) -> None:
 
 @pytest.mark.parametrize(
     "generator",
-    [snub_disphenoid, triaugmented_triangular_prism, gyroelongated_square_bipyramid],
+    [
+        snub_disphenoid,
+        triaugmented_triangular_prism,
+        gyroelongated_square_bipyramid,
+    ],
 )
 def test_johnson_deltahedra_closed_map(generator) -> None:
     """New Johnson generators produce closed maps with no edge-pairing errors."""
@@ -130,7 +138,11 @@ def test_johnson_deltahedra_closed_map(generator) -> None:
 
 @pytest.mark.parametrize(
     "generator",
-    [snub_disphenoid, triaugmented_triangular_prism, gyroelongated_square_bipyramid],
+    [
+        snub_disphenoid,
+        triaugmented_triangular_prism,
+        gyroelongated_square_bipyramid,
+    ],
 )
 def test_johnson_deltahedra_all_triangular_faces(generator) -> None:
     """All faces of the Johnson deltahedra generators are triangles."""
