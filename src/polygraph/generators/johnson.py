@@ -164,9 +164,7 @@ def gyroelongated_square_bipyramid() -> DartMap:
         [4, 5, 1], [5, 6, 2], [6, 7, 3], [7, 4, 0],   # type-2
         # Top pyramid (apex 8)
         [0, 1, 8], [1, 2, 8], [2, 3, 8], [3, 0, 8],
-        # TODO(human): add the 4 bottom pyramid faces for apex 9,
-        # using vertex labels from the bottom ring (4,5,6,7).
-        # Hint: the type-2 lateral faces expose darts 4→5, 5→6, 6→7, 7→4
-        # at the bottom boundary — your faces must supply the reverse darts.
+        # Bottom pyramid (apex 9)
+        [5, 4, 9], [6, 5, 9], [7, 6, 9], [4, 7, 9]
     ]
     return DartMap.from_face_lists(faces, num_vertices=10)
