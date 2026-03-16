@@ -69,7 +69,7 @@ def _face_sizes_at_vertex(dm: DartMap, v: int) -> tuple[int, ...]:
 # ---------------------------------------------------------------------------
 
 
-def schlafli_symbol(dm: DartMap) -> tuple[int, int]:
+def schlafli_symbol(dm: DartMap) -> str:
     """Return the Schläfli symbol ``{p, q}`` for a regular polyhedron.
 
     Parameters
@@ -80,9 +80,9 @@ def schlafli_symbol(dm: DartMap) -> tuple[int, int]:
 
     Returns
     -------
-    tuple[int, int]
-        ``(p, q)`` where every face is a *p*-gon and every vertex has
-        degree *q*.
+    str
+        Schlaefli symbol formatted as ``"{p, q}"`` where every face is a
+        *p*-gon and every vertex has degree *q*.
 
     Raises
     ------
@@ -93,7 +93,7 @@ def schlafli_symbol(dm: DartMap) -> tuple[int, int]:
     --------
     >>> from polygraph.generators.platonic import cube
     >>> schlafli_symbol(cube())
-    (4, 3)
+    '{4, 3}'
     """
     face_sizes = {
         sum(1 for _ in face_darts(dm, f)) for f in all_face_orbits(dm)
@@ -107,7 +107,9 @@ def schlafli_symbol(dm: DartMap) -> tuple[int, int]:
             f"face sizes={sorted(face_sizes)}, "
             f"vertex degrees={sorted(vertex_degrees)}"
         )
-    return face_sizes.pop(), vertex_degrees.pop()
+    p = face_sizes.pop()
+    q = vertex_degrees.pop()
+    return f"{{{p}, {q}}}"
 
 
 def vertex_configuration(dm: DartMap) -> str:

@@ -386,17 +386,17 @@ first (simplest), then `cupola(n)` (Phase 2+), then the full catalogue.
 
 ### 1g. `generators/notation.py` — Schläfli & vertex-configuration symbols ✅ Complete
 
-`schlafli_symbol(dm) -> tuple[int, int]` and
+`schlafli_symbol(dm) -> str` and
 `vertex_configuration(dm) -> str` — pure combinatorial queries on the
 traversal layer; no geometry or symmetry required.
 
 | Solid | {p, q} | vertex config |
 |---|---|---|
-| Tetrahedron | (3, 3) | 3.3.3 |
-| Cube | (4, 3) | 4.4.4 |
-| Octahedron | (3, 4) | 3.3.3.3 |
-| Dodecahedron | (5, 3) | 5.5.5 |
-| Icosahedron | (3, 5) | 3.3.3.3.3 |
+| Tetrahedron | {3, 3} | 3.3.3 |
+| Cube | {4, 3} | 4.4.4 |
+| Octahedron | {3, 4} | 3.3.3.3 |
+| Dodecahedron | {5, 3} | 5.5.5 |
+| Icosahedron | {3, 5} | 3.3.3.3.3 |
 | prism(n) | — | 3.4.4 / 4.4.n |
 | antiprism(n) | — | 3.3.3.n |
 

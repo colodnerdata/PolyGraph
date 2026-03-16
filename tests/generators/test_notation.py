@@ -23,16 +23,16 @@ from polygraph.generators.prisms import antiprism, prism
 @pytest.mark.parametrize(
     ("generator", "expected"),
     [
-        (tetrahedron, (3, 3)),
-        (cube, (4, 3)),
-        (octahedron, (3, 4)),
-        (dodecahedron, (5, 3)),
-        (icosahedron, (3, 5)),
+        (tetrahedron, "{3, 3}"),
+        (cube, "{4, 3}"),
+        (octahedron, "{3, 4}"),
+        (dodecahedron, "{5, 3}"),
+        (icosahedron, "{3, 5}"),
     ],
 )
 def test_schlafli_symbol_returns_expected_pair(
     generator,
-    expected: tuple[int, int],
+    expected: str,
 ) -> None:
     assert schlafli_symbol(generator()) == expected
 
@@ -94,5 +94,6 @@ def test_vertex_configuration_rejects_all_pyramids(n: int) -> None:
 def test_schlafli_p_matches_vertex_config(factory) -> None:
     """For regular solids all face sizes in vc equal p."""
     dm = factory()
-    p, _ = schlafli_symbol(dm)
+    symbol = schlafli_symbol(dm)
+    p = int(symbol.removeprefix("{").removesuffix("}").split(",")[0])
     assert all(int(s) == p for s in vertex_configuration(dm).split("."))
