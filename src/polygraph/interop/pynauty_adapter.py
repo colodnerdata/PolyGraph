@@ -51,7 +51,7 @@ def _build_adjacency(
 
     for d in range(n):
         phi_gadget_out = n + d           # gadget for d → phi[d]
-        phi_gadget_in = n + phi_inv[d]   # gadget whose target is d (phi_inv[d] → d)
+        phi_gadget_in = n + phi_inv[d]   # gadget whose target is d
         alpha_gadget = dart_to_alpha_gadget[d]
         adj[d].extend([phi_gadget_out, phi_gadget_in, alpha_gadget])
         adj[phi_gadget_out].extend([d, phi[d]])

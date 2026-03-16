@@ -63,7 +63,8 @@ def test_platonic_generators_pair_edges_in_opposite_directions() -> None:
     ):
         dm = generator()
 
-        # alpha involution guarantees opposite orientation pairing for each edge.
+        # alpha involution guarantees opposite orientation pairing
+        # for each edge.
         for dart in range(dm.num_darts):
             twin = dm.alpha[dart]
             assert twin != dart

@@ -43,7 +43,9 @@ def test_pyramid_counts(n: int, expected_counts: tuple[int, int, int]) -> None:
         (5, (7, 15, 10)),
     ],
 )
-def test_dipyramid_counts(n: int, expected_counts: tuple[int, int, int]) -> None:
+def test_dipyramid_counts(
+    n: int, expected_counts: tuple[int, int, int]
+) -> None:
     dm = dipyramid(n)
 
     assert isinstance(dm, DartMap)
@@ -113,7 +115,7 @@ def test_johnson_deltahedra_counts(
     ],
 )
 def test_johnson_deltahedra_euler_characteristic(generator) -> None:
-    """New Johnson generators produce sphere-topology maps (χ = 2, genus = 0)."""
+    """New Johnson generators produce sphere-topology maps (χ=2, genus=0)."""
     dm = generator()
 
     assert dm.euler_characteristic() == 2
@@ -129,7 +131,7 @@ def test_johnson_deltahedra_euler_characteristic(generator) -> None:
     ],
 )
 def test_johnson_deltahedra_closed_map(generator) -> None:
-    """New Johnson generators produce closed maps with no edge-pairing errors."""
+    """New Johnson generators produce closed maps (no edge-pairing errors)."""
     dm = generator()
 
     _assert_closed_map(dm)

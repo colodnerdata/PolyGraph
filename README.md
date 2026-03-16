@@ -128,12 +128,13 @@ Completed:
 
 - DartMap combinatorial map (permutation, dart map, traversal)
 - polyhedron generators: Platonic solids, prisms, antiprisms, pyramids, dipyramids
+- Johnson deltahedra generators: snub disphenoid (J84), triaugmented triangular prism (J51), gyroelongated square bipyramid (J17)
 - symmetry detection via automorphism groups (pynauty / nauty)
 - dart, vertex, edge, and face orbit decomposition
+- point group classification (T_d, O_h, I_h, D_nh, D_nd, C_nv and all chiral/exceptional variants)
 
 In progress:
 
-- point group classification (tetrahedral, octahedral, icosahedral, dihedral)
 - dual map construction
 - triangulation of non-triangular faces
 
