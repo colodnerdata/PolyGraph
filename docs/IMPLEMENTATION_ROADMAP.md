@@ -402,7 +402,7 @@ traversal layer; no geometry or symmetry required.
 
 Vertex configurations are canonicalised to the lexicographically smallest
 cyclic rotation (e.g. `"3.4.4"` not `"4.4.3"`).  Both functions raise
-`ValueError` for non-regular / non-vertex-transitive inputs.
+`ValueError` for non-regular inputs or those without a uniform vertex configuration.
 
 **Files:**
 - `src/polygraph/generators/notation.py`
