@@ -85,13 +85,20 @@ def _face_sizes_at_vertex(dm: DartMap, v: int) -> tuple[int, ...]:
 
 
 def schlafli_symbol(dm: DartMap) -> str:
-    """Return the Schläfli symbol ``{p, q}`` for a regular polyhedron.
+    """Return the Schläfli symbol ``{p, q}`` for a polyhedral dart map.
+
+    This is a purely combinatorial query: it checks that all faces have the
+    same number of darts (uniform face size) and all vertices have the same
+    degree (uniform vertex degree), and then returns the corresponding
+    Schläfli symbol ``{p, q}``.  These conditions are necessary but not
+    sufficient for full regularity (e.g. flag-transitivity) of the map.
 
     Parameters
     ----------
     dm : DartMap
-        Input dart map.  Must be a regular polyhedron (all faces congruent,
-        all vertices equivalent).
+        Input dart map.  Every face must be a *p*-gon and every vertex must
+        have degree *q* for some integers *p* and *q* (i.e. uniform face size
+        and uniform vertex degree).
 
     Returns
     -------
@@ -118,7 +125,7 @@ def schlafli_symbol(dm: DartMap) -> str:
     }
     if len(face_sizes) != 1 or len(vertex_degrees) != 1:
         raise ValueError(
-            "Not a regular polyhedron: "
+            "Face sizes or vertex degrees are not uniform: "
             f"face sizes={sorted(face_sizes)}, "
             f"vertex degrees={sorted(vertex_degrees)}"
         )
