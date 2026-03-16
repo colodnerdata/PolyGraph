@@ -140,8 +140,9 @@ def vertex_configuration(dm: DartMap) -> str:
     Parameters
     ----------
     dm : DartMap
-        Input dart map.  Must be vertex-transitive (every vertex has the same
-        sequence of surrounding face sizes up to cyclic rotation).
+        Input dart map.  All vertices must share the same vertex
+        configuration (up to cyclic rotation), i.e. the same cyclic
+        sequence of incident face sizes.
 
     Returns
     -------
@@ -153,7 +154,8 @@ def vertex_configuration(dm: DartMap) -> str:
     Raises
     ------
     ValueError
-        If vertex configurations differ between vertices.
+        If not all vertices share the same vertex configuration
+        (up to cyclic rotation).
 
     Examples
     --------
@@ -167,7 +169,7 @@ def vertex_configuration(dm: DartMap) -> str:
 
     if len(set(canonical)) != 1:
         raise ValueError(
-            "Polyhedron is not vertex-transitive: "
-            "vertex configurations differ between vertices"
+            "Not all vertices share the same vertex configuration "
+            "(up to cyclic rotation)"
         )
     return ".".join(str(s) for s in canonical[0])
