@@ -59,10 +59,25 @@ def _face_sizes_at_vertex(dm: DartMap, v: int) -> tuple[int, ...]:
     -----
     This is a pure combinatorial query: for each dart in the vertex orbit of
     ``v``, it counts the darts in the corresponding face orbit.
+
+    Implementation details
+    ----------------------
+    Directly calling :func:`face_darts` for every incident dart would cause
+    the underlying ``phi`` permutation to be rebuilt repeatedly.  Instead we
+    precompute the size of every face once and map each dart to the size of
+    its incident face, then perform cheap lookups while walking around the
+    vertex.
     """
-    return tuple(
-        sum(1 for _ in face_darts(dm, d)) for d in vertex_darts(dm, v)
-    )
+    # Precompute face sizes for all darts in the map.
+    face_size_by_dart: dict[int, int] = {}
+    for f in all_face_orbits(dm):
+        darts_on_face = tuple(face_darts(dm, f))
+        size = len(darts_on_face)
+        for d in darts_on_face:
+            face_size_by_dart[d] = size
+
+    # Collect face sizes around the given vertex in sigma-rotation order.
+    return tuple(face_size_by_dart[d] for d in vertex_darts(dm, v))
 
 # ---------------------------------------------------------------------------
 # Public API
