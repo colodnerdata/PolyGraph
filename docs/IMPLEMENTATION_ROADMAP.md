@@ -6,7 +6,7 @@ PolyGraph is a research library for polyhedral topology built on combinatorial m
 
 - **Structures** ✅ — `permutation`, `dart_map`, `traversal` (~1060 lines)
 - **Generators** ✅ — `platonic`, `prisms`, `johnson` (pyramid/dipyramid families); `archimedean` and `catalan` are stubs deferred to Phase 10
-- **Symmetry algorithms** ✅ — `algorithms/symmetry/automorphisms`, `algorithms/symmetry/orbits`, `interop/pynauty_adapter`
+- **Symmetry algorithms** ✅ — `algorithms/symmetry/automorphisms`, `algorithms/symmetry/orbits`, `interop/pynauty_adapter`, `algorithms/symmetry/point_groups`, `algorithms/symmetry/classify`
 
 Everything else — planar algorithms, triangulation, geometry, visualization, export, remaining interop adapters — exists as empty stubs. This plan sequences the implementation of all remaining layers, respecting dependency order and minimizing mathematical machinery at each stage.
 
@@ -384,46 +384,29 @@ first (simplest), then `cupola(n)` (Phase 2+), then the full catalogue.
 - `tests/generators/test_platonic.py`
 - `tests/generators/test_prisms.py`
 
-### 1g. `generators/notation.py` — Schläfli & vertex-configuration symbols
+### 1g. `generators/notation.py` — Schläfli & vertex-configuration symbols ✅ Complete
 
-**Minimum foundation:** Only the already-complete traversal layer is needed — no geometry, no symmetry.
+`schlafli_symbol(dm) -> tuple[int, int]` and
+`vertex_configuration(dm) -> str` — pure combinatorial queries on the
+traversal layer; no geometry or symmetry required.
 
-**Schläfli symbol `{p, q}`** is defined only for *regular* polyhedra where every face is a p-gon and every vertex has degree q. Both values are read directly from the dart map:
+| Solid | {p, q} | vertex config |
+|---|---|---|
+| Tetrahedron | (3, 3) | 3.3.3 |
+| Cube | (4, 3) | 4.4.4 |
+| Octahedron | (3, 4) | 3.3.3.3 |
+| Dodecahedron | (5, 3) | 5.5.5 |
+| Icosahedron | (3, 5) | 3.3.3.3.3 |
+| prism(n) | — | 3.4.4 / 4.4.n |
+| antiprism(n) | — | 3.3.3.n |
 
-```python
-def schlafli_symbol(dm: DartMap) -> tuple[int, int]:
-    """Return (p, q) for a regular polyhedron, or raise ValueError if not regular."""
-    face_sizes = {len(list(face_darts(dm, f))) for f in all_face_orbits(dm)}
-    vertex_degrees = {len(list(vertex_darts(dm, v))) for v in all_vertex_orbits(dm)}
-    if len(face_sizes) != 1 or len(vertex_degrees) != 1:
-        raise ValueError("Not a regular polyhedron")
-    return face_sizes.pop(), vertex_degrees.pop()
-```
-
-| Solid | {p, q} |
-|---|---|
-| Tetrahedron | {3, 3} |
-| Cube | {4, 3} |
-| Octahedron | {3, 4} |
-| Dodecahedron | {5, 3} |
-| Icosahedron | {3, 5} |
-
-**Vertex-configuration string** generalizes to *semi-regular* (Archimedean) polyhedra and prisms, where different face sizes can appear around each vertex. For a given vertex v, walk around its face orbits in sigma-order and record face sizes:
-
-```python
-def vertex_configuration(dm: DartMap) -> str:
-    """Return the vertex-configuration string, e.g. '3.4.3.4' for cuboctahedron.
-    Raises ValueError if the configuration differs between vertices.
-    """
-```
-
-- For a prism(n): `4.4.n`
-- For an antiprism(n): `3.3.3.n`
-- Archimedean solids have uniform vertex configurations (same for every vertex)
+Vertex configurations are canonicalised to the lexicographically smallest
+cyclic rotation (e.g. `"3.4.4"` not `"4.4.3"`).  Both functions raise
+`ValueError` for non-regular / non-vertex-transitive inputs.
 
 **Files:**
 - `src/polygraph/generators/notation.py`
-- tests added to `tests/generators/test_platonic.py` and `tests/generators/test_prisms.py`
+- `tests/generators/test_notation.py`
 ---
 
 ## Phase 2: Symmetry Detection ✅
@@ -472,14 +455,28 @@ Any automorphism of this colored graph that permutes dart vertices satisfies `pi
 
 ## Phase 3: Symmetry Classification & Point Groups ✅ Complete
 
-### 3a. `algorithms/symmetry/point_groups.py`
-- Define point group templates as named tuples: `(name, order, generators_pattern)`
-- Families: C_n, D_n, T, O, I (and their variants with reflections)
-- `cyclic(n)`, `dihedral(n)`, `tetrahedral()`, `octahedral()`, `icosahedral()`
+### 3a. `algorithms/symmetry/point_groups.py` ✅
+Frozen `PointGroup(name, order)` dataclass plus factory functions covering all
+polyhedral point group families:
 
-### 3b. `algorithms/symmetry/classify.py`
-- `classify_symmetry(generators, dm) -> str`: Match computed automorphism group against known point group templates
-- Uses group order + orbit structure to narrow candidates
+| Factory | Group(s) | Order |
+|---------|----------|-------|
+| `tetrahedral(full=True/False)` | T_d / T | 24 / 12 |
+| `pyritohedral()` | T_h | 24 |
+| `octahedral(full=True/False)` | O_h / O | 48 / 24 |
+| `icosahedral(full=True/False)` | I_h / I | 120 / 60 |
+| `dihedral(n, "h"/"d")` | D_nh / D_nd | 4n |
+| `dihedral_chiral(n)` | D_n | 2n |
+| `cyclic(n)` | C_nv | 2n |
+| `cyclic_pure(n)` | C_n | n |
+| `cyclic_horizontal(n)` | C_nh | 2n |
+| `improper(n)` | S_2n | 2n |
+| `C_S`, `C_I` constants | C_s, C_i | 2 |
+
+### 3b. `algorithms/symmetry/classify.py` ✅
+`classify_symmetry(generators, dm, order=None) -> PointGroup`: classifies the
+automorphism group of a dart map as a named point group using three combinatorial
+invariants — no geometry required.
 
 **Math:** Group order alone is insufficient — orbit structure and face size distribution
 are also required to uniquely identify the group. Full decision table:
@@ -489,14 +486,20 @@ are also required to uniquely identify the group. Full decision table:
 | I_h   | 120 | 1  | 1  | flag-transitive      |
 | I     | 60  | 1  | 1  | flag-transitive, chiral |
 | O_h   | 48  | 1  | 1  | flag-transitive      |
-| T_d   | 24  | 1  | 1  | has reflections      |
 | O     | 24  | 1  | 1  | no reflections (chiral) |
+| T_h   | 24  | 1  | 1  | reflection, central inversion |
+| T_d   | 24  | 1  | 1  | reflection, no central inversion |
 | D_nh  | 4n  | 1  | 2  | lateral face size ≠ 3 (prism) |
 | D_nd  | 4n  | 1  | 2  | lateral face size = 3 (antiprism) |
 | D_nh  | 4n  | 2  | 1  | (dipyramid)          |
 | C_nv  | 2n  | 2  | 2  | (pyramid)            |
 
 *nv* = number of vertex orbits, *nf* = number of face orbits.
+
+The T_d / T_h split (both order 24, nv=1, nf=1, with reflections) is resolved by
+checking whether any orientation-reversing group element is **central** (commutes with
+all generators). In T_h, the inversion `i` is central; in T_d, all orientation-reversing
+elements (σ_d, S_4) are non-central. This is detected by BFS-enumerating the full group.
 
 Note on orbit counts: prisms have **nv=1** because the horizontal mirror σ_h maps the
 top vertex ring onto the bottom ring, making all 2n vertices equivalent. Dipyramids
@@ -506,7 +509,8 @@ form another — there is no symmetry operation that maps an apex to an equatori
 ### Files
 - `src/polygraph/algorithms/symmetry/point_groups.py`
 - `src/polygraph/algorithms/symmetry/classify.py`
-- `tests/algorithms/test_symmetry_classify.py`
+- `tests/algorithms/test_point_groups.py` (pynauty-free; tests all factories)
+- `tests/algorithms/test_symmetry_classify.py` (requires pynauty; skipped otherwise)
 
 ---
 
