@@ -311,8 +311,8 @@ existing generators:
 
 - **3 Platonic:** tetrahedron, octahedron, icosahedron (`platonic.py`)
 - **2 via `bipyramid(n)`:** triangular bipyramid (J12, n=3), pentagonal bipyramid (J13, n=5)
-- **3 remaining Johnson deltahedra** — implemented as hardcoded face-list
-  stubs in `johnson.py`:
+- **3 remaining Johnson deltahedra** — implemented as hardcoded face lists
+  in `johnson.py`:
 
 | Function | Johnson # | V | E | F |
 |---|---|---|---|---|
