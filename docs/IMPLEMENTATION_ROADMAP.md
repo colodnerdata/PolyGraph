@@ -5,8 +5,8 @@
 PolyGraph is a research library for polyhedral topology built on combinatorial maps. The following layers are implemented:
 
 - **Structures** ✅ — `permutation`, `dart_map`, `traversal` (~1060 lines)
-- **Generators** ✅ — `platonic`, `prisms`, `johnson` (pyramid/dipyramid families); `archimedean` and `catalan` are stubs deferred to Phase 10
-- **Symmetry algorithms** ✅ — `algorithms/symmetry/automorphisms`, `algorithms/symmetry/orbits`, `interop/pynauty_adapter`, `algorithms/symmetry/point_groups`, `algorithms/symmetry/classify`
+- **Generators** ✅ — `platonic`, `prisms`, `johnson` (pyramid/dipyramid families + three convex-deltahedra with hardcoded generators: J84, J51, J17); `archimedean` and `catalan` are stubs deferred to Phase 10
+- **Symmetry algorithms** ✅ — `algorithms/symmetry/automorphisms`, `algorithms/symmetry/orbits`, `algorithms/symmetry/point_groups`, `algorithms/symmetry/classify`, `interop/pynauty_adapter`
 
 Everything else — planar algorithms, triangulation, geometry, visualization, export, remaining interop adapters — exists as empty stubs. This plan sequences the implementation of all remaining layers, respecting dependency order and minimizing mathematical machinery at each stage.
 
@@ -304,15 +304,15 @@ These seven solids do not belong to any parametric family.
 | J91 | Bilunabirotunda | D2h | 26 | 49 | 25 |
 | J92 | Triangular hebesphenorotunda | C3v | 21 | 33 | 14 |
 
-### 1d. Convex Deltahedra — Coverage Confirmed
+### 1d. Convex Deltahedra — Coverage Confirmed ✅
 
 All 8 convex deltahedra (polyhedra whose faces are all equilateral triangles) are covered by
 existing generators:
 
 - **3 Platonic:** tetrahedron, octahedron, icosahedron (`platonic.py`)
 - **2 via `bipyramid(n)`:** triangular bipyramid (J12, n=3), pentagonal bipyramid (J13, n=5)
-- **3 remaining Johnson deltahedra** — add as individual stubs in `johnson.py` (defer
-  implementation; hardcoded face lists required, no simple parametric form):
+- **3 remaining Johnson deltahedra** — implemented as hardcoded face lists
+  in `johnson.py`:
 
 | Function | Johnson # | V | E | F |
 |---|---|---|---|---|
