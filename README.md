@@ -131,7 +131,8 @@ Completed:
 - Johnson deltahedra generators: snub disphenoid (J84), triaugmented triangular prism (J51), gyroelongated square bipyramid (J17)
 - symmetry detection via automorphism groups (pynauty / nauty)
 - dart, vertex, edge, and face orbit decomposition
-- point group classification (T_d, O_h, I_h, D_nh, D_nd, C_nv and all chiral/exceptional variants)
+- point group definitions for all standard polyhedral families (I_h/I, O_h/O, T_d/T_h/T, D_nh/D_nd/D_n, C_nv/C_nh/C_n, S_2n, C_s, C_i)
+- point group classification via `classify_symmetry`: currently handles I_h/I, O_h/O, T_d/T_h, D_nh/D_nd, and C_nv
 
 In progress:
 
