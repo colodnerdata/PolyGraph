@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from polygraph.generators.johnson import bipyramid, dipyramid, pyramid
+from polygraph.generators.notation import schlafli_symbol, vertex_configuration
 from polygraph.generators.platonic import (
     cube,
     dodecahedron,
@@ -22,4 +23,6 @@ __all__ = [
     "pyramid",
     "dipyramid",
     "bipyramid",
+    "schlafli_symbol",
+    "vertex_configuration",
 ]
