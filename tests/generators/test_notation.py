@@ -72,7 +72,7 @@ def test_vertex_configuration_returns_expected_string(
 
 def test_vertex_configuration_rejects_non_vertex_transitive_polyhedron(
 ) -> None:
-    with pytest.raises(ValueError, match=r"not vertex-transitive"):
+    with pytest.raises(ValueError, match=r"Not all vertices share the same"):
         vertex_configuration(pyramid(4))
 
 
