@@ -32,7 +32,8 @@ def pyramid(n: int) -> DartMap:
     Returns
     -------
     DartMap
-        Closed combinatorial map with counts ``(V, E, F) = (n + 1, 2n, n + 1)``.
+        Closed combinatorial map with counts
+        ``(V, E, F) = (n + 1, 2n, n + 1)``.
 
     Raises
     ------
