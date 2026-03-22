@@ -545,7 +545,7 @@ dual_phi   = phi⁻¹ ∘ alpha    (by definition: phi(d) = sigma⁻¹ ∘ alpha
 
 **Math:** For a combinatorial map (sigma, alpha), the dual is (phi, alpha) where phi = sigma⁻¹ ∘ alpha. Since our DartMap stores sigma and alpha, the dual's sigma is the original phi, and the dual's alpha stays the same.
 
-**Validation:** `dual_of(cube())` should have the topology of an octahedron (V=6, E=12, F=8). `dual_of(dual_of(dm))` should recover a map isomorphic to the original (same V, E, F; dart indices relabeled via alpha conjugation).
+**Validation:** `dual_of(cube())` should have the topology of an octahedron (V=6, E=12, F=8). `dual_of(dual_of(dm))` should recover a map isomorphic to the original (same V, E, F; concretely, the two maps differ only by a global permutation of dart indices induced by `alpha`, i.e., relabeling each dart `d` as `alpha(d)` makes the permutations match).
 
 ### 4b. `structures/validation.py`
 Extract and expose the invariant checks already embedded in `DartMap.__post_init__`:
