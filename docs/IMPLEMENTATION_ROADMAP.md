@@ -99,7 +99,7 @@ J-numbers follow MathWorld / Johnson (1966).
 | J1 | Square pyramid | C4v | 5 | 8 | 5 |
 | J2 | Pentagonal pyramid | C5v | 6 | 10 | 6 |
 
-**Cupolas and Rotunda** (J3–J6)
+**Cupolae and Rotunda** (J3–J6)
 
 | J# | Name | Sym | V | E | F |
 |---|---|---|---|---|---|
@@ -149,7 +149,7 @@ Note: The square dipyramid is the octahedron (Platonic), hence excluded.
 Note: The gyroelongated triangular dipyramid is the icosahedron (Platonic),
 and the gyroelongated pentagonal dipyramid is non-convex; both excluded.
 
-**Elongated Cupola and Rotunda** (J18–J21)
+**Elongated Cupolae and Rotundas** (J18–J21)
 
 Cupola/rotunda with a prism inserted at the polygonal base.
 
@@ -160,7 +160,7 @@ Cupola/rotunda with a prism inserted at the polygonal base.
 | J20 | Elongated pentagonal cupola | C5v | 25 | 45 | 22 |
 | J21 | Elongated pentagonal rotunda | C5v | 30 | 55 | 27 |
 
-**Gyroelongated Cupola and Rotunda** (J22–J25)
+**Gyroelongated Cupolae and Rotundas** (J22–J25)
 
 Cupola/rotunda with an antiprism inserted at the polygonal base.
 The antiprism's alternating triangles reduce symmetry from Cnv to Cn
@@ -179,7 +179,7 @@ for the n=5 cases (J24, J25).
 |---|---|---|---|---|---|
 | J26 | Gyrobifastigium | D2d | 8 | 14 | 8 |
 
-**Bicupola and Cupola-Rotunda** (J27–J34)
+**Bicupolae and Cupolarotundas** (J27–J34)
 
 Two cupolas (or a cupola and rotunda) joined at their polygonal bases.
 Note: triangular gyrobicupola = cuboctahedron (Archimedean, excluded);
@@ -196,7 +196,7 @@ pentagonal gyrobirotunda = icosidodecahedron (Archimedean, excluded).
 | J33 | Pentagonal gyrocupolarotunda | C5 | 25 | 50 | 27 |
 | J34 | Pentagonal orthobirotunda | D5h | 30 | 60 | 32 |
 
-**Elongated Bicupola and Cupola-Rotunda** (J35–J43)
+**Elongated Bicupolae and Cupolarotundas** (J35–J43)
 
 Bicupola with a prism inserted between the two cupolas.
 Note: elongated square orthobicupola = rhombicuboctahedron
@@ -214,7 +214,7 @@ Note: elongated square orthobicupola = rhombicuboctahedron
 | J42 | Elongated pentagonal gyrobirotunda | — | D5d | 40 | 80 | 42 |
 | J43 | Elongated pentagonal orthobirotunda | — | C5v | 40 | 80 | 42 |
 
-**Gyroelongated Bicupola and Related** (J44–J48)
+**Gyroelongated Bicupolae and Cupolarotundas** (J44–J48)
 
 Bicupola with an antiprism inserted between the two cupolas.
 In the gyroelongated case, ortho and gyro orientations are equivalent
