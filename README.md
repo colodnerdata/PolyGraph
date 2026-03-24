@@ -126,7 +126,7 @@ Research Roadmap
 
 Completed:
 
-- DartMap combinatorial map (permutation, dart map, traversal)
+- DartMap combinatorial map (permutation, dart map, traversal, dual construction)
 - polyhedron generators: Platonic solids, prisms, antiprisms, pyramids, dipyramids
 - Johnson deltahedra generators: snub disphenoid (J84), triaugmented triangular prism (J51), gyroelongated square bipyramid (J17)
 - symmetry detection via automorphism groups (pynauty / nauty)
@@ -136,7 +136,6 @@ Completed:
 
 Planned:
 
-- dual map construction
 - triangulation of non-triangular faces
 - planar embeddings using canonical ordering
 - convex grid drawing algorithms (Chrobak–Kant, Bekos et al.)

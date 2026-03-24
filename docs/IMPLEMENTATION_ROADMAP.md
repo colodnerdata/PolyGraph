@@ -4,7 +4,7 @@
 
 PolyGraph is a research library for polyhedral topology built on combinatorial maps. The following layers are implemented:
 
-- **Structures** ✅ — `permutation`, `dart_map`, `traversal` (~1060 lines)
+- **Structures** ✅ — `permutation`, `dart_map`, `traversal`, `dual` (~1130 lines)
 - **Generators** ✅ — `platonic`, `prisms`, `johnson` (pyramid/dipyramid families + three convex-deltahedra with hardcoded generators: J84, J51, J17); `archimedean` and `catalan` are stubs deferred to Phase 10
 - **Symmetry algorithms** ✅ — `algorithms/symmetry/automorphisms`, `algorithms/symmetry/orbits`, `algorithms/symmetry/point_groups`, `algorithms/symmetry/classify`, `interop/pynauty_adapter`
 
@@ -531,7 +531,7 @@ form another — there is no symmetry operation that maps an apex to an equatori
 
 ## Phase 4: Structure Completions — Dual & Validation
 
-### 4a. `structures/dual.py`
+### 4a. `structures/dual.py` ✅ Complete
 Dual map construction: swap vertex and face roles.
 
 ```
