@@ -26,7 +26,7 @@ def dual_of(dm: DartMap) -> DartMap:
         Dual map ``(phi, alpha)`` on the same darts.
     """
     phi_list = [dm.phi(d) for d in range(dm.num_darts)]
-    return DartMap(sigma=phi_list, alpha=list(dm.alpha))
+    return DartMap(sigma=phi_list, alpha=dm.alpha)
 
 
 def _invert(perm: Sequence[int], n: int) -> list[int] | None:
