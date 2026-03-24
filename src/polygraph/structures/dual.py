@@ -35,12 +35,16 @@ def _invert(perm: Sequence[int], n: int) -> list[int] | None:
         return None
 
     inv = [-1] * n
-    for i, j in enumerate(perm):
-        if not 0 <= j < n:
-            return None
-        if inv[j] != -1:
-            return None
-        inv[j] = i
+    try:
+        for i, j in enumerate(perm):
+            if not 0 <= j < n:
+                return None
+            if inv[j] != -1:
+                return None
+            inv[j] = i
+    except (TypeError, ValueError):
+        # Non-integer or otherwise invalid entries in ``perm``.
+        return None
     return inv
 
 
