@@ -68,24 +68,25 @@ def test_dual_vertex_degrees_match_original_face_sizes(platonic_dm) -> None:
 
 
 @pytest.mark.parametrize(
-    "dm",
+    "factory",
     [
-        tetrahedron(),
-        cube(),
-        octahedron(),
-        dodecahedron(),
-        icosahedron(),
-        prism(3),
-        prism(5),
-        antiprism(3),
-        antiprism(5),
-        pyramid(3),
-        pyramid(6),
-        dipyramid(3),
-        dipyramid(6),
+        tetrahedron,
+        cube,
+        octahedron,
+        dodecahedron,
+        icosahedron,
+        lambda: prism(3),
+        lambda: prism(5),
+        lambda: antiprism(3),
+        lambda: antiprism(5),
+        lambda: pyramid(3),
+        lambda: pyramid(6),
+        lambda: dipyramid(3),
+        lambda: dipyramid(6),
     ],
 )
-def test_double_dual_is_isomorphic_via_alpha(dm) -> None:
+def test_double_dual_is_isomorphic_via_alpha(factory) -> None:
+    dm = factory()
     ddm = dual_of(dual_of(dm))
 
     assert len(ddm.vertex_orbits()) == len(dm.vertex_orbits())
