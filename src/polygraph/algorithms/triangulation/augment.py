@@ -100,7 +100,6 @@ def barycentric_subdivision(dm: DartMap) -> BarycentricResult:
 
     # Pre-compute phi and phi_inv as arrays for speed.
     alpha = dm.alpha
-    sigma = dm.sigma
     phi = [dm._sigma_inv[alpha[d]] for d in range(n)]
     phi_inv = _inverse_permutation(phi)
 
