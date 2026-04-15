@@ -5,12 +5,11 @@ from __future__ import annotations
 import pytest
 
 from polygraph.algorithms.triangulation import (
-    BarycentricResult,
-    CellOrigin,
     CellType,
     barycentric_subdivision,
     validate_triangulation,
 )
+from polygraph.generators.johnson import dipyramid, pyramid
 from polygraph.generators.platonic import (
     cube,
     dodecahedron,
@@ -19,8 +18,6 @@ from polygraph.generators.platonic import (
     tetrahedron,
 )
 from polygraph.generators.prisms import antiprism, prism
-from polygraph.generators.johnson import dipyramid, pyramid
-
 
 # ---------------------------------------------------------------------------
 # Helpers
