@@ -171,7 +171,6 @@ def _build_cell_map(
     * ``6d+5`` starts at the edge-midpoint of ``d``    →  EDGE
     """
 
-    n_orig = original.num_darts
     alpha = original.alpha
 
     # For each new dart, determine (cell_type, original_representative).
