@@ -173,25 +173,40 @@ def _build_cell_map(
 
     alpha = original.alpha
 
+    # Precompute canonical representatives for original vertices and faces:
+    # - Vertex rep: min dart in the original sigma orbit.
+    # - Face rep:   min dart in the original phi orbit.
+    vertex_rep: list[int] = list(range(n_orig))
+    for orbit in _cycle_orbits(original.sigma):
+        rep = min(orbit)
+        for d in orbit:
+            vertex_rep[d] = rep
+
+    face_rep: list[int] = list(range(n_orig))
+    for orbit in _cycle_orbits(original.phi):
+        rep = min(orbit)
+        for d in orbit:
+            face_rep[d] = rep
+
     # For each new dart, determine (cell_type, original_representative).
     def _cell_of_new_dart(new_d: int) -> CellOrigin:
         d = new_d // 6
         offset = new_d % 6
         if offset == 0:
-            # original vertex of d — use min dart in sigma orbit as rep
-            return CellOrigin(CellType.VERTEX, d)
+            # original vertex of d — use canonical vertex rep
+            return CellOrigin(CellType.VERTEX, vertex_rep[d])
         elif offset == 1:
             # edge-midpoint — use canonical edge rep min(d, alpha[d])
             return CellOrigin(CellType.EDGE, min(d, alpha[d]))
         elif offset == 2:
-            # face-center — use d (any dart in face orbit works)
-            return CellOrigin(CellType.FACE, d)
+            # face-center — use canonical face rep
+            return CellOrigin(CellType.FACE, face_rep[d])
         elif offset == 3:
-            # far vertex = vertex of alpha(d)
-            return CellOrigin(CellType.VERTEX, alpha[d])
+            # far vertex = vertex of alpha(d) — use its canonical vertex rep
+            return CellOrigin(CellType.VERTEX, vertex_rep[alpha[d]])
         elif offset == 4:
-            # face-center (same face as d)
-            return CellOrigin(CellType.FACE, d)
+            # face-center (same face as d) — use canonical face rep
+            return CellOrigin(CellType.FACE, face_rep[d])
         else:  # offset == 5
             # edge-midpoint (same edge as d)
             return CellOrigin(CellType.EDGE, min(d, alpha[d]))
