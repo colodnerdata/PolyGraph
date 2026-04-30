@@ -567,24 +567,33 @@ Extract and expose the invariant checks already embedded in `DartMap.__post_init
 
 **Why now:** Chrobak-Kant convex grid drawing (Phase 8: Canonical Ordering & Convex Grid Drawing) requires a **triangulated** 3-connected planar graph. Most Platonic solids are not triangulated (cube has quad faces, dodecahedron has pentagonal faces).
 
-**Placement note:** Phase 5 is intentionally ordered after Phases 2–3 (symmetry detection and classification). The choice of diagonals when splitting non-triangular faces should preserve as much of the original symmetry as possible, rather than breaking it arbitrarily. The exact mechanism for symmetry-preserving triangulation is still to be worked out. A candidate approach: for each orbit of n-gons (n > 3), examine the vertex orbits along the face boundary; if the boundary vertices fall into two or more distinct vertex orbits, prefer diagonals that connect representatives of distinct orbits. Uniform faces (all vertices in one orbit) may require a tie-breaking rule based on dart index or symmetry-group order.
+**Placement note:** Phase 5 is intentionally ordered after Phases 2–3 (symmetry detection and classification). This phase now adopts **barycentric subdivision** as the canonical, coordinate-free triangulation. This choice is symmetry-preserving by construction (no arbitrary diagonal choices), but it is intentionally not minimal in output size.
 
 ### 5a. `algorithms/triangulation/augment.py`
-- `triangulate(dm) -> TriangulationResult`: Fan-triangulate every non-triangular face by adding edges from one vertex to all non-adjacent vertices on the face boundary
-- Track which edges are "dummy" (added by triangulation) by recording their **representative darts** (one dart per undirected edge, per the representative-dart convention), so they can be removed later — return a `TriangulationResult(dart_map, dummy_edges)` namedtuple, where `dummy_edges` is this collection of representative darts
+- `barycentric_subdivision(dm) -> BarycentricResult`: Replace each original vertex/edge/face with a new barycentric vertex and create one triangle for each incidence flag `(v ⊂ e ⊂ f)`.
+- Return both:
+  - `dart_map`: subdivided map
+  - `cell_map`: map from new-vertex representative dart to origin cell metadata
+  - `origin_to_vertex`: inverse lookup from origin cell metadata to new-vertex representative dart
 
-**Math:** For a face with k vertices (k > 3), pick one vertex v and add edges to the k-3 non-adjacent vertices. This adds k-3 edges and splits the face into k-2 triangles. New darts need correct sigma/alpha wiring.
+**Math:** If original counts are `(V, E, F)` and `n = 2E` darts, barycentric subdivision yields:
+- `V' = V + E + F`
+- `E' = 6E = 3n`
+- `F' = 4E = 2n` (all triangles)
+- `darts' = 12E = 6n`
+with Euler characteristic preserved.
 
-**Implementation approach:** Rebuild face lists with subdivided faces, then call `DartMap.from_face_lists()`. This is simpler than in-place dart surgery and leverages the existing validated constructor.
+**Implementation approach:** Build dense `new_alpha` and `new_phi` arrays in linear time, derive `new_sigma = new_alpha ∘ new_phi⁻¹`, then construct `DartMap`.
 
 ### 5b. `algorithms/triangulation/validation.py`
-- `is_triangulated(dm) -> bool`: Check that every face orbit has exactly 3 darts
+- `validate_barycentric_subdivision(original, subdivided) -> None`: Verify barycentric count identities, triangular faces, and topological invariants.
+- `is_triangulated(dm) -> bool`: (optional generic helper) check that every face orbit has exactly 3 darts.
 
 ### Testing
-- `triangulate(cube())` should have F=12 (6 quads → 12 triangles), all faces triangular
-- `triangulate(tetrahedron())` should be a no-op (already triangulated)
+- `barycentric_subdivision(cube())` should have `(V, E, F) = (26, 72, 48)`, all faces triangular
+- `barycentric_subdivision(tetrahedron())` should have `(V, E, F) = (14, 36, 24)` and `num_darts = 72`
 - Euler characteristic preserved
-- `is_triangulated()` returns True after triangulation
+- `validate_barycentric_subdivision()` accepts valid subdivisions
 
 ### Files
 - `src/polygraph/algorithms/triangulation/augment.py`

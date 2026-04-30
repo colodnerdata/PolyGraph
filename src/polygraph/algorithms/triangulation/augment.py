@@ -69,10 +69,14 @@ class BarycentricResult:
     cell_map : dict[int, CellOrigin]
         Maps each new vertex representative dart to the original cell it
         came from.
+    origin_to_vertex : dict[CellOrigin, int]
+        Inverse lookup: maps each original cell-origin tag to its new
+        barycentric vertex representative dart.
     """
 
     dart_map: DartMap
     cell_map: dict[int, CellOrigin]
+    origin_to_vertex: dict[CellOrigin, int]
 
 
 def barycentric_subdivision(dm: DartMap) -> BarycentricResult:
@@ -100,6 +104,7 @@ def barycentric_subdivision(dm: DartMap) -> BarycentricResult:
 
     # Pre-compute phi and phi_inv as arrays for speed.
     alpha = dm.alpha
+    sigma = dm.sigma
     sigma_inv = _inverse_permutation(sigma)
     phi = [sigma_inv[alpha[d]] for d in range(n)]
     phi_inv = _inverse_permutation(phi)
@@ -151,8 +156,13 @@ def barycentric_subdivision(dm: DartMap) -> BarycentricResult:
     # Build cell_map: new vertex representative → original cell
     # ------------------------------------------------------------------
     cell_map = _build_cell_map(dm, subdivided)
+    origin_to_vertex = {origin: rep for rep, origin in cell_map.items()}
 
-    return BarycentricResult(dart_map=subdivided, cell_map=cell_map)
+    return BarycentricResult(
+        dart_map=subdivided,
+        cell_map=cell_map,
+        origin_to_vertex=origin_to_vertex,
+    )
 
 
 def _build_cell_map(
@@ -172,18 +182,21 @@ def _build_cell_map(
     """
 
     alpha = original.alpha
+    n_orig = original.num_darts
+    sigma_orbits = original.vertex_orbits()
+    phi_orbits = original.face_orbits()
 
     # Precompute canonical representatives for original vertices and faces:
     # - Vertex rep: min dart in the original sigma orbit.
     # - Face rep:   min dart in the original phi orbit.
     vertex_rep: list[int] = list(range(n_orig))
-    for orbit in _cycle_orbits(original.sigma):
+    for orbit in sigma_orbits:
         rep = min(orbit)
         for d in orbit:
             vertex_rep[d] = rep
 
     face_rep: list[int] = list(range(n_orig))
-    for orbit in _cycle_orbits(original.phi):
+    for orbit in phi_orbits:
         rep = min(orbit)
         for d in orbit:
             face_rep[d] = rep
