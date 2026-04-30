@@ -313,16 +313,31 @@ class TestKnownValues:
         dm = tetrahedron()
         sd = barycentric_subdivision(dm).dart_map
         # Tetrahedron: V=4, E=6, F=4, n=12
-        assert _counts(sd) == (4 + 6 + 4, 3 * 12, 2 * 12)  # (14, 36, 24)
+        # Expected: (14, 36, 24)
+        assert _counts(sd) == (
+            4 + 6 + 4,
+            3 * 12,
+            2 * 12,
+        )
 
     def test_cube_subdivision(self):
         dm = cube()
         sd = barycentric_subdivision(dm).dart_map
         # Cube: V=8, E=12, F=6, n=24
-        assert _counts(sd) == (8 + 12 + 6, 3 * 24, 2 * 24)  # (26, 72, 48)
+        # Expected: (26, 72, 48)
+        assert _counts(sd) == (
+            8 + 12 + 6,
+            3 * 24,
+            2 * 24,
+        )
 
     def test_dodecahedron_subdivision(self):
         dm = dodecahedron()
         sd = barycentric_subdivision(dm).dart_map
         # Dodecahedron: V=20, E=30, F=12, n=60
-        assert _counts(sd) == (20 + 30 + 12, 3 * 60, 2 * 60)  # (62, 180, 120)
+        # Expected: (62, 180, 120)
+        assert _counts(sd) == (
+            20 + 30 + 12,
+            3 * 60,
+            2 * 60,
+        )
