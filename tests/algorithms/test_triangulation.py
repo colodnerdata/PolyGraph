@@ -226,6 +226,44 @@ class TestCellMap:
 
 
 # ---------------------------------------------------------------------------
+# origin_to_vertex inverse mapping
+# ---------------------------------------------------------------------------
+
+
+class TestOriginToVertex:
+    """origin_to_vertex must be the exact inverse of cell_map."""
+
+    @pytest.mark.parametrize(
+        "make",
+        [tetrahedron, cube, octahedron, dodecahedron, icosahedron],
+    )
+    def test_bijection(self, make):
+        """origin_to_vertex and cell_map have the same number of entries."""
+        result = barycentric_subdivision(make())
+        assert len(result.origin_to_vertex) == len(result.cell_map)
+
+    @pytest.mark.parametrize(
+        "make",
+        [tetrahedron, cube, octahedron, dodecahedron, icosahedron],
+    )
+    def test_round_trip_cell_map_to_origin(self, make):
+        """cell_map[origin_to_vertex[origin]] == origin for every origin."""
+        result = barycentric_subdivision(make())
+        for origin, rep in result.origin_to_vertex.items():
+            assert result.cell_map[rep] == origin
+
+    @pytest.mark.parametrize(
+        "make",
+        [tetrahedron, cube, octahedron, dodecahedron, icosahedron],
+    )
+    def test_round_trip_origin_to_vertex(self, make):
+        """origin_to_vertex[cell_map[rep]] == rep for every rep."""
+        result = barycentric_subdivision(make())
+        for rep, origin in result.cell_map.items():
+            assert result.origin_to_vertex[origin] == rep
+
+
+# ---------------------------------------------------------------------------
 # Symmetry preservation
 # ---------------------------------------------------------------------------
 
