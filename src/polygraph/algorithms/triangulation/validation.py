@@ -35,15 +35,17 @@ def validate_barycentric_subdivision(
             f"got {subdivided.num_darts}."
         )
 
+    subdivided_face_orbits = subdivided.face_orbits()
+
     # Check all faces are triangles (phi orbits of length 3)
-    for face in subdivided.face_orbits():
+    for face in subdivided_face_orbits:
         if len(face) != 3:
             raise ValueError(
                 f"Subdivision face has {len(face)} darts; expected 3."
             )
 
     # Check face count: 4E = 2n
-    face_count = len(subdivided.face_orbits())
+    face_count = len(subdivided_face_orbits)
     expected_faces = 2 * n
     if face_count != expected_faces:
         raise ValueError(
