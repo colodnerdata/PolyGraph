@@ -7,7 +7,7 @@ import pytest
 from polygraph.algorithms.triangulation import (
     CellType,
     barycentric_subdivision,
-    validate_triangulation,
+    validate_barycentric_subdivision,
 )
 from polygraph.generators.johnson import dipyramid, pyramid
 from polygraph.generators.platonic import (
@@ -166,7 +166,7 @@ class TestTopology:
 
 
 class TestValidation:
-    """The validate_triangulation helper should accept correct subdivisions."""
+    """The barycentric validator should accept correct subdivisions."""
 
     @pytest.mark.parametrize(
         "make",
@@ -176,7 +176,13 @@ class TestValidation:
         dm = make()
         sd = barycentric_subdivision(dm).dart_map
         # Should not raise
-        validate_triangulation(dm, sd)
+        validate_barycentric_subdivision(dm, sd)
+
+
+def test_barycentric_subdivision_smoke_tetrahedron():
+    """Smoke test for barycentric subdivision on tetrahedron."""
+    result = barycentric_subdivision(tetrahedron())
+    assert result.dart_map.num_darts == 72
 
 
 # ---------------------------------------------------------------------------

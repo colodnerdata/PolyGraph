@@ -5,7 +5,9 @@ from __future__ import annotations
 from polygraph.structures.dart_map import DartMap
 
 
-def validate_triangulation(original: DartMap, subdivided: DartMap) -> None:
+def validate_barycentric_subdivision(
+    original: DartMap, subdivided: DartMap
+) -> None:
     """Validate that a subdivided map is a correct barycentric subdivision.
 
     Parameters
@@ -80,3 +82,4 @@ def validate_triangulation(original: DartMap, subdivided: DartMap) -> None:
         raise ValueError(
             f"Genus changed: {g_orig} → {g_sub}."
         )
+

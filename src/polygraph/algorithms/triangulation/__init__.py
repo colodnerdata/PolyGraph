@@ -9,7 +9,7 @@ from polygraph.algorithms.triangulation.augment import (
     barycentric_subdivision,
 )
 from polygraph.algorithms.triangulation.validation import (
-    validate_triangulation,
+    validate_barycentric_subdivision
 )
 
 __all__ = [
@@ -17,5 +17,5 @@ __all__ = [
     "CellOrigin",
     "CellType",
     "barycentric_subdivision",
-    "validate_triangulation",
+    "validate_barycentric_subdivision",
 ]
