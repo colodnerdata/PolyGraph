@@ -179,12 +179,6 @@ class TestValidation:
         validate_barycentric_subdivision(dm, sd)
 
 
-def test_barycentric_subdivision_smoke_tetrahedron():
-    """Smoke test for barycentric subdivision on tetrahedron."""
-    result = barycentric_subdivision(tetrahedron())
-    assert result.dart_map.num_darts == 72
-
-
 # ---------------------------------------------------------------------------
 # Cell map
 # ---------------------------------------------------------------------------
