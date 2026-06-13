@@ -43,7 +43,7 @@ def dart_map_to_nx(dm: DartMap) -> object:
         If networkx is not installed.
     """
     try:
-        import networkx as nx
+        import networkx as nx  # type: ignore[import-untyped]
     except ImportError as exc:
         raise ImportError(_IMPORT_ERROR_MSG) from exc
 
