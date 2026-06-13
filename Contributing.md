@@ -2,6 +2,37 @@
 
 PolyGraph is a research-oriented Python library for combinatorial topology, planar graph drawing, and polyhedral realization. Contributions should favor clarity, mathematical correctness, and maintainability over cleverness.
 
+## Local setup (Unix)
+
+Use `uv` so local environments match the lockfile and CI.
+
+```bash
+uv sync --extra dev
+uv run pytest tests
+```
+
+The commands above are cross-platform (Linux/macOS/Windows).
+
+Optional Unix convenience commands:
+
+```bash
+make install-dev
+make test
+make lint
+make typecheck
+```
+
+Install Git hooks (recommended):
+
+```bash
+make pre-commit-install
+```
+
+This installs:
+
+- pre-commit hooks for formatting and basic file hygiene
+- pre-push hooks for `mypy` and `pytest`
+
 ## General principles
 
 Write the simplest correct version first. Prefer explicit code over abstraction when the abstraction makes the mathematics harder to follow.
@@ -127,6 +158,9 @@ If a convention is easy to misunderstand, document it in the module docstring an
 ## Testing expectations
 
 Every nontrivial contribution should include tests.
+
+Prefer `uv run pytest` over bare `pytest` so test execution is bound to
+the project environment and lockfile.
 
 Tests should focus first on correctness and invariants, not incidental implementation details.
 

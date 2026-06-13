@@ -155,6 +155,26 @@ Interfaces may change rapidly while the architecture stabilizes.
 
 ---
 
+Quickstart (Unix)
+
+Use `uv` for reproducible, lockfile-based environments.
+
+```bash
+uv sync --extra dev
+uv run pytest tests
+```
+
+The commands above are cross-platform (Linux/macOS/Windows).
+
+If you prefer Unix shortcuts, run:
+
+```bash
+make install-dev
+make test
+```
+
+---
+
 License
 
 Apache License 2.0
