@@ -46,6 +46,11 @@ back to float64 for rendering.
 
 ---
 
+## Phase 0: Plan
+
+Enrich this document to plan out each of these parts in detail, with substeps listed out as a checklist to be checked off by the agent, and with tests and success critieria for each. Also create an AGENTS.md file inside the frontend directory that describes the existing code there. Ensure the user checks and approves the plan.
+
+
 ## Phase 1: Generators — Platonic Solids & Parametric Families (1a–1d, 1g complete; 1e–1f deferred)
 
 **Why first:** Every subsequent layer needs concrete DartMaps to test against. Currently the only test fixture is a hand-built tetrahedron in test_traversal.py.

@@ -125,7 +125,8 @@ def schlafli_symbol(dm: DartMap) -> str:
     }
     if len(face_sizes) != 1 or len(vertex_degrees) != 1:
         raise ValueError(
-            "Face sizes or vertex degrees are not uniform: "
+            "Not a regular polyhedron: "
+            "face sizes or vertex degrees are not uniform: "
             f"face sizes={sorted(face_sizes)}, "
             f"vertex degrees={sorted(vertex_degrees)}"
         )
