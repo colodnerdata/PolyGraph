@@ -7,12 +7,35 @@ the group action.
 All functions use **union-find with path compression** and require only a
 single pass over the generators — the union-find closure is equivalent to
 the full group orbit partition.
+
+Orientation-reversing generators
+--------------------------------
+Generators follow the convention of
+:mod:`polygraph.interop.pynauty_adapter`: an orientation-reversing
+automorphism ``g`` satisfies ``g ∘ phi = phi⁻¹ ∘ g`` and
+``g ∘ alpha = alpha ∘ g``.  Such a ``g`` maps every face (phi-orbit) onto a
+face and every edge onto an edge, but it does **not** map vertices
+(sigma-orbits) onto vertices: from ``sigma = alpha ∘ phi⁻¹`` one gets
+``g ∘ sigma = alpha ∘ phi ∘ g``, whose orbits are the ``alpha``-images of
+sigma-orbits.
+
+Geometrically, a reflection sends the counter-clockwise boundary of a face
+to the *clockwise* boundary of its image, i.e. to the ``alpha``-twins of
+the image face's darts.  A single dart permutation therefore cannot
+preserve both sigma-orbits and phi-orbits under a reflection.  The
+permutation ``alpha ∘ g`` satisfies ``(alpha ∘ g) ∘ sigma = sigma⁻¹ ∘
+(alpha ∘ g)`` and is the correct action on vertices.  :func:`vertex_orbits`
+applies this twist to every orientation-reversing generator; the face and
+edge actions need no adjustment.
 """
 
 from __future__ import annotations
 
 from collections import defaultdict
 
+from polygraph.algorithms.symmetry.automorphisms import (
+    is_orientation_preserving,
+)
 from polygraph.structures.dart_map import DartMap
 from polygraph.structures.permutation import Permutation
 
@@ -120,6 +143,11 @@ def vertex_orbits(
     Vertices are represented by the smallest dart in their ``sigma`` orbit
     (the representative-dart convention from
     :mod:`polygraph.structures.traversal`).
+
+    For an orientation-reversing generator ``g`` the vertex of dart ``d``
+    is sent to the vertex of ``alpha[g[d]]``, not ``g[d]``; see the module
+    docstring for why.  Orientation-preserving generators commute with
+    ``sigma`` and are applied directly.
     """
     # Map each dart to its vertex representative (min dart in sigma orbit).
     dart_to_vertex: list[int] = [0] * dm.num_darts
@@ -133,11 +161,14 @@ def vertex_orbits(
     rep_to_idx = {r: i for i, r in enumerate(vertex_reps)}
     num_vertices = len(vertex_reps)
 
+    alpha = dm.alpha
     parent = _make_uf(num_vertices)
     for g in generators:
+        preserving = is_orientation_preserving(g, dm)
         for d in range(dm.num_darts):
+            image = g[d] if preserving else alpha[g[d]]
             v_src = rep_to_idx[dart_to_vertex[d]]
-            v_dst = rep_to_idx[dart_to_vertex[g[d]]]
+            v_dst = rep_to_idx[dart_to_vertex[image]]
             _union(parent, v_src, v_dst)
 
     raw = _collect_orbits(parent)

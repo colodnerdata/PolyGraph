@@ -1,9 +1,22 @@
 """Automorphism group computation for combinatorial dart maps.
 
 The automorphism group ``Aut(dm)`` consists of all bijections on dart indices
-that commute with both ``sigma`` (vertex rotation) and ``alpha`` (edge
-involution) — or commute with ``alpha`` while reversing ``sigma`` to
-``sigma⁻¹`` for orientation-reversing symmetries.
+that commute with ``alpha`` (edge involution) and either commute with
+``phi`` (face traversal) — orientation-preserving — or conjugate ``phi`` to
+``phi⁻¹`` — orientation-reversing.
+
+Convention for orientation-reversing elements
+---------------------------------------------
+Generators returned here follow the *phi-convention* of
+:mod:`polygraph.interop.pynauty_adapter`: a reversing ``g`` maps faces to
+faces and edges to edges as sets of darts, but maps each vertex (sigma-orbit)
+to the ``alpha``-image of a vertex.  The correct action of ``g`` on vertices
+is ``d ↦ alpha[g[d]]``.  :func:`polygraph.algorithms.symmetry.orbits.
+vertex_orbits` applies that twist; callers acting on vertices directly must
+do the same.  The alternative *sigma-convention* (``alpha ∘ g``, which
+conjugates ``sigma`` to ``sigma⁻¹``) is equivalent as an abstract group but
+has the mirror-image defect on faces, so neither convention lets one dart
+permutation act correctly on both vertices and faces.
 
 Generators are computed via pynauty (which calls nauty in C).  The group
 order is read directly from nauty's output.  ``automorphism_group_order`` is
