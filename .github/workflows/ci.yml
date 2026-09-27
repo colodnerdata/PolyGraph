@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      # The package is not pip-installed here: the core `dependencies` list
+      # in pyproject.toml currently pulls in heavy, unused packages (jax with
+      # CUDA, pymc, ...).  Until that list is trimmed, install only what the
+      # code and tests actually import and run against the source tree.
+      - name: Install tooling and runtime extras
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "pytest>=8" "ruff>=0.6" "mypy>=1.10"
+          python -m pip install "networkx>=3.2" "pynauty>=2.8.8.1"
+
+      - name: Ruff
+        run: python -m ruff check src tests
+
+      - name: Mypy
+        env:
+          PYTHONPATH: src
+        run: python -m mypy src/polygraph
+
+      - name: Pytest
+        env:
+          PYTHONPATH: src
+        run: python -m pytest tests -q

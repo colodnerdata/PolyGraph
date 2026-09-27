@@ -142,14 +142,19 @@ class TestDegree:
             assert view.degree(v) == 3
 
     def test_pyramid_apex_degree_4(self, pyramid_view):
-        # Apex (label 4, vertex ID 2 in scan order) is the unique degree-4 vertex.
-        degrees = [pyramid_view.degree(v) for v in range(pyramid_view.num_vertices)]
+        # Apex (label 4, vertex ID 2 in scan order) is the unique
+        # degree-4 vertex.
+        degrees = [
+            pyramid_view.degree(v) for v in range(pyramid_view.num_vertices)
+        ]
         assert degrees.count(4) == 1
         assert max(degrees) == 4
 
     def test_pyramid_base_degree_3(self, pyramid_view):
         # The four base vertices all have degree 3.
-        degrees = [pyramid_view.degree(v) for v in range(pyramid_view.num_vertices)]
+        degrees = [
+            pyramid_view.degree(v) for v in range(pyramid_view.num_vertices)
+        ]
         assert degrees.count(3) == 4
 
     def test_out_of_range_raises(self):
@@ -187,7 +192,7 @@ class TestFaceBoundaryVertices:
         outer_fid = choose_outer_face(pyramid_dm)
         bv = pyramid_view.face_boundary_vertices(outer_fid)
         assert len(bv) == 4
-        # All four boundary vertices are base vertices (degree 3, not the apex).
+        # All four boundary vertices are base vertices (degree 3, not apex).
         for v in bv:
             assert pyramid_view.degree(v) == 3
 
@@ -340,7 +345,7 @@ class TestOuterFaceAnchors:
         assert bv[(i1 - 1) % len(bv)] == v2
 
     def test_vn_is_successor_in_phi_orbit(self):
-        """vn must be the vertex AFTER v1 in the outer face phi orbit."""
+        """Check that vn is the vertex after v1 in the outer phi orbit."""
         dm = cube()
         (v1, v2, vn), fid = self._anchors(dm)
         view = PlanarEmbeddingView(dm)

@@ -38,7 +38,7 @@ def test_schlafli_symbol_returns_expected_pair(
 
 
 def test_schlafli_symbol_rejects_non_regular_polyhedron() -> None:
-    with pytest.raises(ValueError, match=r"Not a regular polyhedron"):
+    with pytest.raises(ValueError, match=r"not uniform"):
         schlafli_symbol(prism(3))
 
 

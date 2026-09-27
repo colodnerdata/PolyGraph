@@ -10,10 +10,13 @@ order) is not preserved in the NetworkX graph.
 
 For the reverse direction, :func:`nx_to_dart_map` derives face lists from
 the planar half-edge embedding returned by ``networkx.check_planarity``
-and then delegates to :meth:`~polygraph.structures.dart_map.DartMap.from_face_lists`.
+and then delegates to
+:meth:`~polygraph.structures.dart_map.DartMap.from_face_lists`.
 """
 
 from __future__ import annotations
+
+from collections.abc import Hashable
 
 from polygraph.structures.dart_map import DartMap
 
@@ -101,16 +104,28 @@ def nx_to_dart_map(g: object) -> DartMap:
         raise ValueError("Graph must have at least one node.")
     if g.number_of_edges() == 0:
         raise ValueError(
-            "Graph must contain at least one edge; DartMap requires at least one dart."
+            "Graph must contain at least one edge; "
+            "DartMap requires at least one dart."
         )
     if not nx.is_connected(g):
-        raise ValueError("Graph must be connected; disconnected graphs are not supported.")
+        raise ValueError(
+            "Graph must be connected; disconnected graphs are not supported."
+        )
 
     is_planar, embedding = nx.check_planarity(g)
+    if not is_planar:
+        raise ValueError("Graph is not planar; cannot convert to DartMap.")
+
+    nodes = list(g.nodes())
+    node_to_idx: dict[Hashable, int] = {
+        node: i for i, node in enumerate(nodes)
+    }
+    num_vertices = len(nodes)
+
     # Each directed half-edge belongs to exactly one face in the planar
     # embedding.  Walk each unvisited half-edge to collect its face, marking
     # all half-edges of that face so they are not revisited.
-    seen_half_edges: set[tuple] = set()
+    seen_half_edges: set[tuple[Hashable, Hashable]] = set()
     faces: list[list[int]] = []
     for u, v in embedding.edges():
         if (u, v) in seen_half_edges:
