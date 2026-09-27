@@ -33,6 +33,9 @@ polygraph/\
 │       │   ├── platonic.py\
 │       │   ├── prisms.py\
 │       │   ├── johnson.py\
+│       │   ├── archimedean.py\
+│       │   ├── catalan.py\
+│       │   ├── notation.py\
 │       │   └── conway.py\
 │       │\
 │       ├── algorithms/\
@@ -68,12 +71,23 @@ polygraph/\
 │       │   │   ├── objectives.py\
 │       │   │   └── constraints.py\
 │       │   │\
-│       │   └── polyhedral/\
+│       │   ├── polyhedral/\
+│       │   │   ├── __init__.py\
+│       │   │   ├── face_planes.py\
+│       │   │   ├── vertex_recovery.py\
+│       │   │   ├── initialization.py\
+│       │   │   └── optimizer.py\
+│       │   │\
+│       │   ├── exact/\
+│       │   │   ├── __init__.py\
+│       │   │   ├── conversion.py\
+│       │   │   ├── reconstruction.py\
+│       │   │   └── verification.py\
+│       │   │\
+│       │   └── validation/\
 │       │       ├── __init__.py\
-│       │       ├── face_planes.py\
-│       │       ├── vertex_recovery.py\
-│       │       ├── initialization.py\
-│       │       └── optimizer.py\
+│       │       ├── diagnostics.py\
+│       │       └── stability.py\
 │       │\
 │       ├── visualization/\
 │       │   ├── __init__.py\
@@ -83,9 +97,10 @@ polygraph/\
 │       │\
 │       ├── interop/\
 │       │   ├── __init__.py\
-│       │   ├── bliss_adapter.py\
+│       │   ├── pynauty_adapter.py\
 │       │   ├── networkx_adapter.py\
-│       │   └── ogdf_adapter.py\
+│       │   ├── ogdf_adapter.py\
+│       │   └── cgal_adapter.py\
 │       │\
 │       └── export/\
 │           ├── __init__.py\
@@ -296,7 +311,6 @@ Notional methods:
 Notional methods:
 
 * classify_symmetry(generators, dm)
-* concretize_symmetry(classification, face_orbit_reps, generators, dm)
 
 ---
 
