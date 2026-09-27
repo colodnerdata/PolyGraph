@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import pytest
 
+from polygraph.generators.platonic import cube, tetrahedron
 from polygraph.structures.dart_map import DartMap
 from polygraph.structures.permutation import Permutation
 from polygraph.structures.traversal import (
@@ -11,6 +14,8 @@ from polygraph.structures.traversal import (
     all_edge_orbits,
     all_face_orbits,
     all_vertex_orbits,
+    dart_to_face_ids,
+    dart_to_vertex_ids,
     edge_darts,
     face_darts,
     faces_incident_to_vertex,
@@ -140,3 +145,56 @@ def test_skeleton_traversal_methods_align_with_rep_dart_model() -> None:
     for a, b in pairs:
         assert dm.alpha[a] == b
         assert dm.alpha[b] == a
+
+
+@pytest.mark.parametrize("make_map", [tetrahedron, cube])
+def test_dart_to_vertex_ids_partitions_darts_in_scan_order(
+    make_map: Callable[[], DartMap],
+) -> None:
+    dm = make_map()
+    ids = dart_to_vertex_ids(dm)
+    num_vertices = len(dm.vertex_orbits())
+
+    assert len(ids) == dm.num_darts
+    assert sorted(set(ids)) == list(range(num_vertices))
+    assert ids[0] == 0
+
+    for d in range(dm.num_darts):
+        for x in vertex_darts(dm, d):
+            assert ids[x] == ids[d]
+
+    for vid, orbit_darts in enumerate(dm.vertex_orbits()):
+        assert all(ids[d] == vid for d in orbit_darts)
+
+
+@pytest.mark.parametrize("make_map", [tetrahedron, cube])
+def test_dart_to_face_ids_partitions_darts_in_scan_order(
+    make_map: Callable[[], DartMap],
+) -> None:
+    dm = make_map()
+    ids = dart_to_face_ids(dm)
+    num_faces = len(dm.face_orbits())
+
+    assert len(ids) == dm.num_darts
+    assert sorted(set(ids)) == list(range(num_faces))
+    assert ids[0] == 0
+
+    for d in range(dm.num_darts):
+        for x in face_darts(dm, d):
+            assert ids[x] == ids[d]
+
+    for fid, orbit_darts in enumerate(dm.face_orbits()):
+        assert all(ids[d] == fid for d in orbit_darts)
+
+
+def test_dart_to_ids_distinguish_darts_in_different_orbits() -> None:
+    dm = cube()
+    vertex_ids = dart_to_vertex_ids(dm)
+    face_ids = dart_to_face_ids(dm)
+
+    for d in range(dm.num_darts):
+        # alpha[d] starts at the other endpoint of the edge, so it lies in
+        # a different vertex orbit and (on a closed surface) a different
+        # face orbit.
+        assert vertex_ids[dm.alpha[d]] != vertex_ids[d]
+        assert face_ids[dm.alpha[d]] != face_ids[d]

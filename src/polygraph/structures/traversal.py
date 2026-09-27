@@ -4,6 +4,10 @@ This module uses a representative-dart convention:
 - vertices are represented by a dart in their ``sigma`` orbit,
 - faces are represented by a dart in their ``phi`` orbit,
 - edges are represented by a dart in their ``alpha`` pair.
+
+For callers that need dense integer identifiers instead of representative
+darts, :func:`dart_to_vertex_ids` and :func:`dart_to_face_ids` assign IDs
+``0..V-1`` / ``0..F-1`` in orbit scan order.
 """
 
 from __future__ import annotations
@@ -231,6 +235,99 @@ def all_edge_orbits(dm: DartMap) -> Iterator[int]:
     for d in range(dm.num_darts):
         if d < dm.alpha[d]:
             yield d
+
+
+def _scan_order_ids(orbits: list[list[int]], num_darts: int) -> list[int]:
+    """Label every dart with the scan-order index of its orbit.
+
+    Parameters
+    ----------
+    orbits : list[list[int]]
+        Disjoint orbits covering ``0..num_darts-1``, in scan order.
+    num_darts : int
+        Number of darts in the map.
+
+    Returns
+    -------
+    list[int]
+        Array of length ``num_darts`` with ``ids[d] == i`` for every dart
+        ``d`` in ``orbits[i]``.
+    """
+    ids: list[int] = [-1] * num_darts
+    for orbit_id, orbit_darts in enumerate(orbits):
+        for d in orbit_darts:
+            ids[d] = orbit_id
+    return ids
+
+
+def dart_to_vertex_ids(dm: DartMap) -> list[int]:
+    """Return a lookup array mapping each dart to its vertex ID.
+
+    Parameters
+    ----------
+    dm : DartMap
+        Input dart map.
+
+    Returns
+    -------
+    list[int]
+        Array of length ``dm.num_darts`` whose entry ``d`` is the vertex ID
+        in ``0..V-1`` of the ``sigma`` orbit containing dart ``d``.
+
+    Notes
+    -----
+    Vertex IDs are assigned in the order that ``sigma`` orbits are first
+    encountered when scanning darts from ``0`` upward, i.e. in the order
+    returned by ``dm.vertex_orbits()``.  Dart ``0`` therefore always has
+    vertex ID ``0``.  This is the convention used by
+    :class:`polygraph.algorithms.planar.embedding.PlanarEmbeddingView` and
+    by :mod:`polygraph.interop.networkx_adapter`.
+
+    It differs from the *representative-dart* convention used by
+    :mod:`polygraph.algorithms.symmetry.orbits`, where a vertex is named by
+    the smallest dart in its ``sigma`` orbit rather than by a dense index.
+
+    See Also
+    --------
+    dart_to_face_ids : Face-ID analogue over ``phi`` orbits.
+    all_vertex_orbits : Representative darts of vertex orbits.
+    """
+    return _scan_order_ids(dm.vertex_orbits(), dm.num_darts)
+
+
+def dart_to_face_ids(dm: DartMap) -> list[int]:
+    """Return a lookup array mapping each dart to its face ID.
+
+    Parameters
+    ----------
+    dm : DartMap
+        Input dart map.
+
+    Returns
+    -------
+    list[int]
+        Array of length ``dm.num_darts`` whose entry ``d`` is the face ID in
+        ``0..F-1`` of the ``phi`` orbit containing dart ``d``.
+
+    Notes
+    -----
+    Face IDs are assigned in the order that ``phi`` orbits are first
+    encountered when scanning darts from ``0`` upward, i.e. in the order
+    returned by ``dm.face_orbits()``.  Dart ``0`` therefore always has face
+    ID ``0``.  This is the convention used by
+    :class:`polygraph.algorithms.planar.embedding.PlanarEmbeddingView` and
+    by :mod:`polygraph.interop.networkx_adapter`.
+
+    It differs from the *representative-dart* convention used by
+    :mod:`polygraph.algorithms.symmetry.orbits`, where a face is named by
+    the smallest dart in its ``phi`` orbit rather than by a dense index.
+
+    See Also
+    --------
+    dart_to_vertex_ids : Vertex-ID analogue over ``sigma`` orbits.
+    all_face_orbits : Representative darts of face orbits.
+    """
+    return _scan_order_ids(dm.face_orbits(), dm.num_darts)
 
 
 def neighbors(dm: DartMap, vertex: int) -> Iterator[int]:
