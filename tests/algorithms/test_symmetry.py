@@ -13,6 +13,13 @@ from polygraph.algorithms.symmetry import (
     is_orientation_preserving,
     vertex_orbits,
 )
+from polygraph.generators.johnson import (
+    dipyramid,
+    gyroelongated_square_bipyramid,
+    pyramid,
+    snub_disphenoid,
+    triaugmented_triangular_prism,
+)
 from polygraph.generators.platonic import (
     cube,
     dodecahedron,
@@ -175,6 +182,79 @@ def test_prism3_face_orbits():
     dm = prism(3)
     gens = compute_automorphism_generators(dm)
     assert len(face_orbits(gens, dm)) == 2
+
+
+# ---------------------------------------------------------------------------
+# Orbit counts — non-vertex-transitive solids
+#
+# Regression tests for orientation-reversing generators.  Under the pynauty
+# phi-convention a reflection maps sigma-orbits to alpha-images of
+# sigma-orbits, so a naive vertex action merges distinct vertex orbits.
+# Every solid below has a reflection and vertices of two distinct degrees,
+# so a wrong action collapses the count to 1.
+# ---------------------------------------------------------------------------
+
+
+def _degree_of_rep(dm, rep):
+    """Return the degree of the vertex whose representative dart is *rep*."""
+    for cycle in dm.vertex_orbits():
+        if min(cycle) == rep:
+            return len(cycle)
+    raise AssertionError(f"{rep} is not a vertex representative")
+
+
+@pytest.mark.parametrize(
+    "factory, expected_vertex_orbits",
+    [
+        (lambda: pyramid(4), 2),
+        (lambda: pyramid(5), 2),
+        (lambda: dipyramid(3), 2),
+        (lambda: dipyramid(5), 2),
+        (snub_disphenoid, 2),
+        (triaugmented_triangular_prism, 2),
+        (gyroelongated_square_bipyramid, 2),
+    ],
+    ids=["pyramid4", "pyramid5", "dipyramid3", "dipyramid5", "J84", "J51",
+         "J17"],
+)
+def test_vertex_orbit_count_with_reflections(
+    factory, expected_vertex_orbits
+):
+    dm = factory()
+    gens = compute_automorphism_generators(dm)
+    assert any(not is_orientation_preserving(g, dm) for g in gens)
+    assert len(vertex_orbits(gens, dm)) == expected_vertex_orbits
+
+
+@pytest.mark.parametrize(
+    "factory",
+    [lambda: pyramid(4), lambda: dipyramid(3), snub_disphenoid],
+    ids=["pyramid4", "dipyramid3", "J84"],
+)
+def test_vertex_orbits_have_uniform_degree(factory):
+    dm = factory()
+    gens = compute_automorphism_generators(dm)
+    for orbit in vertex_orbits(gens, dm):
+        degrees = {_degree_of_rep(dm, rep) for rep in orbit}
+        assert len(degrees) == 1, f"orbit {orbit} mixes degrees {degrees}"
+
+
+def test_reversing_generator_twisted_by_alpha_preserves_vertices():
+    """Check that ``alpha ∘ g`` maps sigma-orbits onto sigma-orbits."""
+    dm = dipyramid(3)
+    gens = compute_automorphism_generators(dm)
+    reversing = [g for g in gens if not is_orientation_preserving(g, dm)]
+    assert reversing
+
+    dart_to_vertex = [0] * dm.num_darts
+    for cycle in dm.vertex_orbits():
+        for d in cycle:
+            dart_to_vertex[d] = min(cycle)
+
+    for g in reversing:
+        for cycle in dm.vertex_orbits():
+            images = {dart_to_vertex[dm.alpha[g[d]]] for d in cycle}
+            assert len(images) == 1
 
 
 # ---------------------------------------------------------------------------

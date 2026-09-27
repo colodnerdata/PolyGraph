@@ -83,14 +83,6 @@ def test_antiprism_classify(n):
 # ---------------------------------------------------------------------------
 
 
-_REFLECTION_VERTEX_ORBIT_BUG = (
-    "Orientation-reversing generators from the pynauty encoding preserve "
-    "faces but not sigma-orbits, so vertex_orbits() undercounts on "
-    "non-vertex-transitive solids and classify_symmetry() fails."
-)
-
-
-@pytest.mark.xfail(strict=True, reason=_REFLECTION_VERTEX_ORBIT_BUG)
 @pytest.mark.parametrize("n", [3, 5, 6])
 def test_dipyramid_classify(n):
     dm = dipyramid(n)
@@ -106,7 +98,6 @@ def test_dipyramid_classify(n):
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.xfail(strict=True, reason=_REFLECTION_VERTEX_ORBIT_BUG)
 @pytest.mark.parametrize("n", [4, 5, 6])
 def test_pyramid_classify(n):
     dm = pyramid(n)
