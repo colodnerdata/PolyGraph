@@ -12,6 +12,26 @@ and genus.
 The structure is designed to support planar graph algorithms, symmetry
 analysis, and polyhedral realizations while remaining independent of any
 coordinate system.
+
+Naming vertices and faces
+-------------------------
+Vertices and faces are orbits of darts, and two conventions are used
+across the library to name them:
+
+- *Scan-order IDs*: integers ``0..V-1`` / ``0..F-1`` assigned in the order
+  orbits are first encountered when scanning darts from ``0`` upward
+  (the order of :meth:`DartMap.vertex_orbits` / :meth:`DartMap.face_orbits`).
+  Use :func:`polygraph.structures.traversal.dart_to_vertex_ids` and
+  :func:`polygraph.structures.traversal.dart_to_face_ids` to obtain these.
+  Planar drawing code and the NetworkX adapter use this convention.
+- *Representative darts*: an orbit is named by one of its darts, usually
+  the smallest.  :mod:`polygraph.structures.traversal` yields
+  traversal-derived representatives, and
+  :mod:`polygraph.algorithms.symmetry.orbits` uses the smallest dart in
+  each orbit.
+
+The two schemes are not interchangeable; convert via the lookup arrays
+above when crossing between them.
 """
 
 from __future__ import annotations

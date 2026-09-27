@@ -7,9 +7,11 @@ by :mod:`polygraph.interop.networkx_adapter`.
 
 Orientation notes
 -----------------
-``sigma`` cycles darts **counter-clockwise** around each vertex in the plane
-(verified empirically: when interior faces are wound CCW, the sigma orbit at
-a vertex visits neighbours in CCW angular order).  Consequently:
+``sigma`` cycles darts **counter-clockwise** around each vertex in the plane.
+This is a consequence of the construction convention:
+:meth:`DartMap.from_face_lists` builds ``sigma = alpha o phi^{-1}`` from the
+supplied face cycles, so when interior faces are wound CCW, ``sigma`` visits
+the neighbours of each vertex in CCW angular order.  Consequently:
 
 - :meth:`ordered_neighbors` returns neighbour IDs in **CCW** order.
 - :meth:`face_boundary_vertices` returns vertices in the **phi orbit** order,
