@@ -5,8 +5,9 @@ map representation and NetworkX undirected graphs.
 
 The vertex labeling used by :func:`dart_map_to_nx` assigns integer node
 indices ``0..V-1`` in the order that vertex orbits are first encountered
-during a dart scan from dart 0.  Embedding information (cyclic neighbor
-order) is not preserved in the NetworkX graph.
+during a dart scan from dart 0 (the scan-order convention implemented by
+:func:`polygraph.structures.traversal.dart_to_vertex_ids`).  Embedding
+information (cyclic neighbor order) is not preserved in the NetworkX graph.
 
 For the reverse direction, :func:`nx_to_dart_map` derives face lists from
 the planar half-edge embedding returned by ``networkx.check_planarity``
@@ -19,6 +20,7 @@ from __future__ import annotations
 from collections.abc import Hashable
 
 from polygraph.structures.dart_map import DartMap
+from polygraph.structures.traversal import dart_to_vertex_ids
 
 _IMPORT_ERROR_MSG = (
     "networkx is required for graph interoperability. "
@@ -50,15 +52,11 @@ def dart_map_to_nx(dm: DartMap) -> object:
     except ImportError as exc:
         raise ImportError(_IMPORT_ERROR_MSG) from exc
 
-    dart_to_vertex: list[int] = [-1] * dm.num_darts
-    vertex_id = 0
-    for orbit in dm.vertex_orbits():
-        for d in orbit:
-            dart_to_vertex[d] = vertex_id
-        vertex_id += 1
+    dart_to_vertex = dart_to_vertex_ids(dm)
+    num_vertices = len(dm.vertex_orbits())
 
     g: nx.Graph = nx.Graph()
-    g.add_nodes_from(range(vertex_id))
+    g.add_nodes_from(range(num_vertices))
     for d in range(dm.num_darts):
         if d < dm.alpha[d]:
             g.add_edge(dart_to_vertex[d], dart_to_vertex[dm.alpha[d]])

@@ -21,49 +21,11 @@ from __future__ import annotations
 
 from polygraph.structures.dart_map import DartMap
 from polygraph.structures.traversal import (
+    dart_to_face_ids,
+    dart_to_vertex_ids,
     face_darts,
     vertex_darts,
 )
-
-
-def _build_dart_to_vertex(dm: DartMap) -> list[int]:
-    """Build a dart-index → vertex-ID lookup array.
-
-    Parameters
-    ----------
-    dm : DartMap
-        Input dart map.
-
-    Returns
-    -------
-    list[int]
-        Array of length ``dm.num_darts`` mapping each dart to its vertex ID.
-    """
-    dart_to_vertex: list[int] = [-1] * dm.num_darts
-    for vid, orbit in enumerate(dm.vertex_orbits()):
-        for d in orbit:
-            dart_to_vertex[d] = vid
-    return dart_to_vertex
-
-
-def _build_dart_to_face(dm: DartMap) -> list[int]:
-    """Build a dart-index → face-ID lookup array.
-
-    Parameters
-    ----------
-    dm : DartMap
-        Input dart map.
-
-    Returns
-    -------
-    list[int]
-        Array of length ``dm.num_darts`` mapping each dart to its face ID.
-    """
-    dart_to_face: list[int] = [-1] * dm.num_darts
-    for fid, orbit in enumerate(dm.face_orbits()):
-        for d in orbit:
-            dart_to_face[d] = fid
-    return dart_to_face
 
 
 class PlanarEmbeddingView:
@@ -95,11 +57,11 @@ class PlanarEmbeddingView:
 
         vertex_orbits = dm.vertex_orbits()
         self._vertex_to_rep: list[int] = [orbit[0] for orbit in vertex_orbits]
-        self._dart_to_vertex: list[int] = _build_dart_to_vertex(dm)
+        self._dart_to_vertex: list[int] = dart_to_vertex_ids(dm)
 
         face_orbits = dm.face_orbits()
         self._face_to_rep: list[int] = [orbit[0] for orbit in face_orbits]
-        self._dart_to_face: list[int] = _build_dart_to_face(dm)
+        self._dart_to_face: list[int] = dart_to_face_ids(dm)
 
     # ------------------------------------------------------------------
     # Counts

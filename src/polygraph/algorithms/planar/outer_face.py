@@ -22,27 +22,7 @@ ordering algorithm can run:
 from __future__ import annotations
 
 from polygraph.structures.dart_map import DartMap
-from polygraph.structures.traversal import face_darts
-
-
-def _build_dart_to_vertex(dm: DartMap) -> list[int]:
-    """Return a dart → vertex-ID lookup array.
-
-    Parameters
-    ----------
-    dm : DartMap
-        Input dart map.
-
-    Returns
-    -------
-    list[int]
-        Array of length ``dm.num_darts``.
-    """
-    dart_to_vertex: list[int] = [-1] * dm.num_darts
-    for vid, orbit in enumerate(dm.vertex_orbits()):
-        for d in orbit:
-            dart_to_vertex[d] = vid
-    return dart_to_vertex
+from polygraph.structures.traversal import dart_to_vertex_ids, face_darts
 
 
 def choose_outer_face(dm: DartMap) -> int:
@@ -123,7 +103,7 @@ def outer_face_anchors(
             f"Outer face has {k} vertices; at least 3 are required."
         )
 
-    dart_to_vertex = _build_dart_to_vertex(dm)
+    dart_to_vertex = dart_to_vertex_ids(dm)
 
     # Boundary vertices in phi orbit order (CW in the plane for outer face).
     bv = [dart_to_vertex[d] for d in face_darts(dm, orbit[0])]
