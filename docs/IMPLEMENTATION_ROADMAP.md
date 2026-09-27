@@ -325,7 +325,7 @@ All 8 convex deltahedra (polyhedra whose faces are all equilateral triangles) ar
 existing generators:
 
 - **3 Platonic:** tetrahedron, octahedron, icosahedron (`platonic.py`)
-- **2 via `bipyramid(n)`:** triangular bipyramid (J12, n=3), pentagonal bipyramid (J13, n=5)
+- **2 via `dipyramid(n)`:** triangular dipyramid (J12, n=3), pentagonal dipyramid (J13, n=5)
 - **3 remaining Johnson deltahedra** — implemented as hardcoded face lists
   in `johnson.py`:
 
@@ -380,7 +380,7 @@ construction (`dual_of`) and Phase 10 Conway operators are complete; most can be
 | `disdyakis_triacontahedron()` | truncated icosidodecahedron | scalene triangle |
 | `pentagonal_hexacontahedron()` | snub dodecahedron | irregular pentagon |
 
-**Implementation priority within Phase 1c:** `pyramid(n)` and `bipyramid(n)`
+**Implementation priority within Phase 1c:** `pyramid(n)` and `dipyramid(n)`
 first (simplest), then `cupola(n)` (Phase 2+), then the full catalogue.
 
 ### Testing
@@ -458,7 +458,7 @@ Any automorphism of this colored graph that permutes dart vertices satisfies `pi
 - Tetrahedron: |Aut| = 24, 1 vertex orbit, 1 edge orbit, 1 face orbit
 - Cube: |Aut| = 48, 1 vertex orbit, 1 edge orbit, 1 face orbit
 - Icosahedron: |Aut| = 120, 1 vertex orbit, 1 edge orbit, 1 face orbit
-- Prism(5): |Aut| = 20, 2 vertex orbits, 2 edge orbits, 2 face orbits
+- Prism(5): |Aut| = 20, 1 vertex orbit, 2 edge orbits, 2 face orbits
 
 ### Files
 - `src/polygraph/interop/pynauty_adapter.py`
@@ -529,7 +529,7 @@ form another — there is no symmetry operation that maps an apex to an equatori
 
 ---
 
-## Phase 4: Structure Completions — Dual & Validation
+## Phase 4: Structure Completions — Dual & Validation (4a complete; 4b pending)
 
 ### 4a. `structures/dual.py` ✅ Complete
 Dual map construction: swap vertex and face roles.
@@ -547,7 +547,7 @@ dual_phi   = phi⁻¹ ∘ alpha    (by definition: phi(d) = sigma⁻¹ ∘ alpha
 
 **Validation:** `dual_of(cube())` should have the topology of an octahedron (V=6, E=12, F=8). `dual_of(dual_of(dm))` should recover a map isomorphic to the original (same V, E, F; concretely, the two maps differ only by a global permutation of dart indices induced by `alpha`, i.e., relabeling each dart `d` as `alpha(d)` makes the permutations match).
 
-### 4b. `structures/validation.py`
+### 4b. `structures/validation.py` (pending — file is an empty stub)
 Extract and expose the invariant checks already embedded in `DartMap.__post_init__`:
 
 - `check_alpha_involution(alpha)` — alpha[alpha[d]] == d, no fixed points
@@ -1073,13 +1073,13 @@ Each phase includes tests. The end-to-end pipeline test after Phase 9:
 
 ```python
 from polygraph.generators.platonic import cube
-from polygraph.algorithms.triangulation.augment import triangulate
+from polygraph.algorithms.triangulation.augment import barycentric_subdivision
 from polygraph.geometry.planar.layout import chrobak_kant_layout
 from polygraph.visualization.matplotlib_planar import draw_planar_graph
 from polygraph.visualization.walkthrough import build_walkthrough_frames, render_walkthrough_matplotlib
 
 dm = cube()
-tri_dm = triangulate(dm).dart_map
+tri_dm = barycentric_subdivision(dm).dart_map
 positions = chrobak_kant_layout(tri_dm)
 draw_planar_graph(tri_dm, positions)
 
