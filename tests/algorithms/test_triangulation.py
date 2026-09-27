@@ -269,31 +269,24 @@ class TestOriginToVertex:
 
 
 class TestSymmetryPreservation:
-    """Automorphism group order must be preserved by subdivision."""
+    """Every automorphism of the input extends to the subdivision.
+
+    The barycentric subdivision is the flag complex, so ``Aut(dm)`` embeds
+    in ``Aut(subdivision)``.  The embedding is onto unless ``dm`` is
+    self-dual: then the vertex/face swap of the flag complex is an extra
+    automorphism not induced by ``dm``, and the order exactly doubles.
+    """
 
     @pytest.mark.parametrize(
-        "name, make, expected_order",
+        "name, make, expected_order, self_dual",
         [
-            pytest.param(
-                "tetrahedron",
-                tetrahedron,
-                24,
-                marks=pytest.mark.xfail(
-                    strict=True,
-                    reason=(
-                        "The tetrahedron is self-dual, so its flag complex "
-                        "gains a duality automorphism: |Aut| doubles to 48. "
-                        "The equality assertion is wrong for self-dual "
-                        "inputs and needs to become a divisibility check."
-                    ),
-                ),
-            ),
-            ("cube", cube, 48),
-            ("octahedron", octahedron, 48),
+            ("tetrahedron", tetrahedron, 24, True),
+            ("cube", cube, 48, False),
+            ("octahedron", octahedron, 48, False),
         ],
     )
     def test_automorphism_group_order_preserved(
-        self, name, make, expected_order
+        self, name, make, expected_order, self_dual
     ):
         pytest.importorskip("pynauty")
         from polygraph.algorithms.symmetry import (
@@ -311,7 +304,9 @@ class TestSymmetryPreservation:
         order_sub = automorphism_group_order(gens_sub, sd.num_darts)
 
         assert order_orig == expected_order
-        assert order_sub == order_orig
+        assert order_sub % order_orig == 0
+        expected_sub = 2 * order_orig if self_dual else order_orig
+        assert order_sub == expected_sub
 
 
 # ---------------------------------------------------------------------------
