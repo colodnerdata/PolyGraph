@@ -180,7 +180,6 @@ def _build_cell_map(
     * ``6d+4`` starts at the face-center of ``d``      →  FACE
     * ``6d+5`` starts at the edge-midpoint of ``d``    →  EDGE
     """
-
     alpha = original.alpha
     n_orig = original.num_darts
     sigma_orbits = original.vertex_orbits()
