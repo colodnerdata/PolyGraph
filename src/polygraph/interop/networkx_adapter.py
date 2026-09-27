@@ -16,6 +16,8 @@ and then delegates to
 
 from __future__ import annotations
 
+from collections.abc import Hashable
+
 from polygraph.structures.dart_map import DartMap
 
 _IMPORT_ERROR_MSG = (
@@ -115,13 +117,15 @@ def nx_to_dart_map(g: object) -> DartMap:
         raise ValueError("Graph is not planar; cannot convert to DartMap.")
 
     nodes = list(g.nodes())
-    node_to_idx: dict = {node: i for i, node in enumerate(nodes)}
+    node_to_idx: dict[Hashable, int] = {
+        node: i for i, node in enumerate(nodes)
+    }
     num_vertices = len(nodes)
 
     # Each directed half-edge belongs to exactly one face in the planar
     # embedding.  Walk each unvisited half-edge to collect its face, marking
     # all half-edges of that face so they are not revisited.
-    seen_half_edges: set[tuple] = set()
+    seen_half_edges: set[tuple[Hashable, Hashable]] = set()
     faces: list[list[int]] = []
     for u, v in embedding.edges():
         if (u, v) in seen_half_edges:
