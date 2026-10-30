@@ -1,6 +1,7 @@
 """Public generators API."""
 from __future__ import annotations
 
+from polygraph.generators.conway import ConwayResult, Origin, dual
 from polygraph.generators.johnson import bipyramid, dipyramid, pyramid
 from polygraph.generators.notation import schlafli_symbol, vertex_configuration
 from polygraph.generators.platonic import (
@@ -13,6 +14,9 @@ from polygraph.generators.platonic import (
 from polygraph.generators.prisms import antiprism, prism
 
 __all__ = [
+    "ConwayResult",
+    "Origin",
+    "dual",
     "tetrahedron",
     "cube",
     "octahedron",
