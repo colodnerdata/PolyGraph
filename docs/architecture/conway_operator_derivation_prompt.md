@@ -240,8 +240,12 @@ each one yourself before relying on it:
 1. Orientation-preserving isomorphism class: `s(M)` and `mirror(s(M))` are
    isomorphic as *unoriented graphs* but, for suitable `M` (e.g. the cube), are
    **not** orientation-preserving isomorphic.
-2. Equivariance with mirror: `s_R(mirror(M)) ≅ mirror(s_L(M))` where
-   `s_L = mirror ∘ s_R ∘ mirror`.
+2. Independent left-handed rule: write a throwaway test-only `s_L_ref` using
+   the opposite displacement (vertex of `d` toward `tail(d)`), coded
+   separately from `s_R`. Require
+   `s_L_ref(M) ≅ mirror(s_R(mirror(M)))` for every `M` in the corpus.
+   (Defining `s_L` as `mirror ∘ s_R ∘ mirror` and testing against that same
+   composite would be tautological, since `mirror` is an involution.)
 3. **Geometric handedness test.** On a convex realization with outward-CCW
    faces, place each new vertex by the rule in section 2 (for `snub`, vertex of
    `d` = `(1-t)·tail + t·head` pulled slightly toward the face centre, small `t`).
@@ -286,7 +290,7 @@ combinatorial tests need only 3-connectivity (Steinitz).
 
 ## 8. Constraints from the repository
 
-- Python 3.11+, NumPy-convention docstrings, Ruff (88 columns), no `print`.
+- Python 3.11+, NumPy-convention docstrings, Ruff (79 columns, per `pyproject.toml`), no `print`.
 - Build output only via `DartMap.from_face_lists(faces, num_vertices)`; it
   rejects faces with fewer than 3 vertices, repeated directed edges and
   missing opposite edges, so a wrong identification fails loudly.
